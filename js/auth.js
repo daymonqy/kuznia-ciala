@@ -19,8 +19,8 @@ auth.onAuthStateChanged((user) => {
 // Aktualizacja UI na podstawie stanu logowania
 function updateUIForAuth(user) {
   const authStatus = document.getElementById('auth-status');
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
+  const formLogin = document.getElementById('form-login');
+  const formRegister = document.getElementById('form-register');
   const userPanel = document.getElementById('user-panel');
   const authTabs = document.getElementById('auth-tabs');
 
@@ -31,8 +31,8 @@ function updateUIForAuth(user) {
       authStatus.innerHTML = `<i class="fas fa-user-check"></i> ${label}`;
       authStatus.classList.add('logged-in');
     }
-    if (loginForm) loginForm.style.display = 'none';
-    if (registerForm) registerForm.style.display = 'none';
+    if (formLogin) formLogin.style.display = 'none';
+    if (formRegister) formRegister.style.display = 'none';
     if (authTabs) authTabs.style.display = 'none';
     if (userPanel) {
       userPanel.style.display = 'block';
@@ -55,10 +55,10 @@ function updateUIForAuth(user) {
 
 // --- FORMULARZE ---
 function showLoginForm() {
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-  if (loginForm) loginForm.style.display = 'block';
-  if (registerForm) registerForm.style.display = 'none';
+  const formLogin = document.getElementById('form-login');
+  const formRegister = document.getElementById('form-register');
+  if (formLogin) formLogin.style.display = 'block';
+  if (formRegister) formRegister.style.display = 'none';
   const tabLogin = document.getElementById('tab-login');
   const tabRegister = document.getElementById('tab-register');
   if (tabLogin) tabLogin.classList.add('active');
@@ -66,10 +66,10 @@ function showLoginForm() {
 }
 
 function showRegisterForm() {
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-  if (loginForm) loginForm.style.display = 'none';
-  if (registerForm) registerForm.style.display = 'block';
+  const formLogin = document.getElementById('form-login');
+  const formRegister = document.getElementById('form-register');
+  if (formLogin) formLogin.style.display = 'none';
+  if (formRegister) formRegister.style.display = 'block';
   const tabLogin = document.getElementById('tab-login');
   const tabRegister = document.getElementById('tab-register');
   if (tabLogin) tabLogin.classList.remove('active');
@@ -124,7 +124,6 @@ async function logout() {
 }
 
 // --- ZAPISYWANIE DANYCH UŻYTKOWNIKA ---
-// Każda akcja użytkownika powinna iść przez te funkcje
 
 async function saveUserData(field, value) {
   if (!currentUser) {
@@ -173,7 +172,6 @@ async function getUserData() {
   }
 }
 
-// Przykład: zapisanie treningu
 async function saveWorkout(workout) {
   if (!currentUser) {
     showMessage('Zaloguj się, aby zapisać trening', 'error');
@@ -216,12 +214,11 @@ function getErrorMessage(error) {
   return map[error.code] || error.message || 'Wystąpił błąd';
 }
 
-// Sprawdzenie czy Firebase jest skonfigurowany
 function isFirebaseConfigured() {
-  return firebaseConfig.apiKey !== 'WSTAW_SWOJ_API_KEY';
+  return typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey !== 'WSTAW_SWOJ_API_KEY';
 }
 
-// Event listenery formularzy (wywoływane po załadowaniu DOM)
+// Event listenery formularzy
 document.addEventListener('DOMContentLoaded', () => {
   if (!isFirebaseConfigured()) {
     const warning = document.getElementById('firebase-warning');
