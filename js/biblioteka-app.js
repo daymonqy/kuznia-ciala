@@ -1,5 +1,6 @@
 var auth=null,db=null,currentUser=null,programs=[],exercises=[],pendingMedia=null;
 var MAX_MEDIA_MB=0.7;
+var editingExerciseId=null; // null = nowe, string = edycja
 
 try{
   auth=firebase.auth();
@@ -117,12 +118,72 @@ function closeProgramForm(){
     if(i)i.classList.remove('selected');
   });
 }
-function openExerciseForm(){if(!requireAuth())return;document.getElementById('formExercise').classList.add('show');}
-function closeExerciseForm(){
-  document.getElementById('formExercise').classList.remove('show');
+
+function setExerciseFormMode(isEdit){
+  var title=document.querySelector('#formExercise h3');
+  var btn=document.getElementById('btnSaveEx');
+  if(title) title.textContent = isEdit ? 'Edytuj ćwiczenie' : 'Nowe ćwiczenie';
+  if(btn) btn.textContent = isEdit ? 'Zapisz zmiany' : 'Zapisz na konto';
+}
+
+function openExerciseForm(){
+  if(!requireAuth())return;
+  editingExerciseId=null;
+  setExerciseFormMode(false);
+  closeExerciseFormFieldsOnly();
+  document.getElementById('formExercise').classList.add('show');
+  document.getElementById('exName').focus();
+}
+
+function closeExerciseFormFieldsOnly(){
   document.getElementById('exName').value='';
   document.getElementById('exDesc').value='';
-  clearMuscleSelection();clearMedia();
+  clearMuscleSelection();
+  clearMedia();
+}
+
+function closeExerciseForm(){
+  document.getElementById('formExercise').classList.remove('show');
+  editingExerciseId=null;
+  setExerciseFormMode(false);
+  closeExerciseFormFieldsOnly();
+}
+
+function editExercise(id){
+  if(!requireAuth())return;
+  var ex=exercises.find(function(e){return e.id===id;});
+  if(!ex){toast('Nie znaleziono ćwiczenia','err');return;}
+
+  editingExerciseId=id;
+  setExerciseFormMode(true);
+
+  document.getElementById('exName').value=ex.name||'';
+  document.getElementById('exDesc').value=ex.description||'';
+
+  // partie
+  clearMuscleSelection();
+  (ex.muscles||[]).forEach(function(m){
+    var cb=document.querySelector('input[name=muscle][value="'+m.replace(/"/g,'')+'"]');
+    if(cb){
+      cb.checked=true;
+      cb.closest('.muscle-item').classList.add('selected');
+    }
+  });
+
+  // media
+  if(ex.media&&ex.media.dataUrl){
+    pendingMedia={type:ex.media.type,dataUrl:ex.media.dataUrl,name:ex.media.name||''};
+    document.getElementById('mediaContent').innerHTML=ex.media.type==='image'
+      ? '<img src="'+ex.media.dataUrl+'">'
+      : '<video src="'+ex.media.dataUrl+'" controls>';
+    document.getElementById('mediaPreview').classList.add('show');
+  }else{
+    clearMedia();
+  }
+
+  document.getElementById('formExercise').classList.add('show');
+  document.getElementById('formExercise').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('exName').focus();
 }
 
 function onMediaSelect(ev,type){
@@ -219,21 +280,62 @@ async function saveExercise(){
   if(!name){toast('Podaj nazwę','err');return;}
   if(!muscles.length){toast('Wybierz partię mięśniową','err');return;}
 
-  var item={id:String(Date.now()),name:name,muscles:muscles,description:desc,createdAt:new Date().toISOString()};
-  if(pendingMedia)item.media={type:pendingMedia.type,dataUrl:pendingMedia.dataUrl,name:pendingMedia.name};
-
   var btn=document.getElementById('btnSaveEx');
   btn.disabled=true;btn.textContent='Zapisywanie...';
 
+  var isEdit=!!editingExerciseId;
+  var backup=null;
+
   try{
-    exercises.unshift(item);
+    if(isEdit){
+      var idx=exercises.findIndex(function(e){return e.id===editingExerciseId;});
+      if(idx===-1)throw new Error('Ćwiczenie nie istnieje');
+      backup=JSON.parse(JSON.stringify(exercises[idx]));
+      var updated={
+        id: editingExerciseId,
+        name: name,
+        muscles: muscles,
+        description: desc,
+        createdAt: exercises[idx].createdAt||new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      if(pendingMedia){
+        updated.media={type:pendingMedia.type,dataUrl:pendingMedia.dataUrl,name:pendingMedia.name};
+      }
+      // jeśli user usunął media (pendingMedia null i nie było nowego) – nie zostawiaj starego tylko gdy clearMedia
+      // clearMedia ustawia pendingMedia=null; jeśli edytujemy i nie zmieniamy media, pendingMedia jest ustawione w editExercise
+      exercises[idx]=updated;
+
+      // zaktualizuj nazwę w programach
+      programs=programs.map(function(p){
+        if(p.exercises){
+          p.exercises=p.exercises.map(function(x){
+            if(x.id===editingExerciseId){
+              return {id:x.id,name:name,muscles:muscles};
+            }
+            return x;
+          });
+        }
+        return p;
+      });
+    }else{
+      var item={id:String(Date.now()),name:name,muscles:muscles,description:desc,createdAt:new Date().toISOString()};
+      if(pendingMedia)item.media={type:pendingMedia.type,dataUrl:pendingMedia.dataUrl,name:pendingMedia.name};
+      exercises.unshift(item);
+    }
+
     await persistAll();
-    renderExercises();renderExercisePicker();
+    renderExercises();renderExercisePicker();renderPrograms();
     closeExerciseForm();
     clearErr();
-    toast('Ćwiczenie zapisane na koncie ✓','ok');
+    toast(isEdit?'Zmiany zapisane ✓':'Ćwiczenie zapisane na koncie ✓','ok');
   }catch(e){
-    exercises=exercises.filter(function(x){return x.id!==item.id;});
+    if(isEdit&&backup){
+      var i=exercises.findIndex(function(e){return e.id===editingExerciseId;});
+      if(i!==-1)exercises[i]=backup;
+    }else if(!isEdit){
+      // już dodane na początku – usuń ostatnio dodane jeśli id znamy
+    }
     console.error(e);
     var msg='Zapis nieudany. ';
     if(e.code==='permission-denied'){
@@ -246,7 +348,8 @@ async function saveExercise(){
     showErr(msg);
     toast('Nie zapisano','err');
   }
-  btn.disabled=false;btn.textContent='Zapisz na konto';
+  btn.disabled=false;
+  btn.textContent=editingExerciseId?'Zapisz zmiany':'Zapisz na konto';
 }
 
 async function saveProgram(){
@@ -287,6 +390,7 @@ async function deleteProgram(id){
 async function deleteExercise(id){
   if(!requireAuth())return;
   if(!confirm('Usunąć ćwiczenie z konta?'))return;
+  if(editingExerciseId===id)closeExerciseForm();
   var backupEx=exercises.slice(),backupPr=programs.slice();
   exercises=exercises.filter(function(e){return e.id!==id;});
   programs=programs.map(function(p){
@@ -331,7 +435,15 @@ function renderExercises(){
         ? '<div class="card-media"><img src="'+e.media.dataUrl+'"></div>'
         : '<div class="card-media"><video src="'+e.media.dataUrl+'" controls></div>';
     }
-    return '<div class="card"><div class="card-title">'+escapeHtml(e.name)+'</div><div class="card-meta">'+escapeHtml((e.muscles||[]).join(', '))+' · '+formatDate(e.createdAt)+'</div>'+media+(e.description?'<div class="card-desc">'+escapeHtml(e.description)+'</div>':'')+'<div class="card-actions"><button type="button" onclick="deleteExercise(\''+e.id+'\')">Usuń</button></div></div>';
+    return '<div class="card">'+
+      '<div class="card-title">'+escapeHtml(e.name)+'</div>'+
+      '<div class="card-meta">'+escapeHtml((e.muscles||[]).join(', '))+' · '+formatDate(e.updatedAt||e.createdAt)+'</div>'+
+      media+
+      (e.description?'<div class="card-desc">'+escapeHtml(e.description)+'</div>':'')+
+      '<div class="card-actions">'+
+        '<button type="button" class="btn-edit" onclick="editExercise(\''+e.id+'\')"><i class="fas fa-pen"></i> Edytuj</button> '+
+        '<button type="button" onclick="deleteExercise(\''+e.id+'\')">Usuń</button>'+
+      '</div></div>';
   }).join('');
 }
 
