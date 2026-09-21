@@ -95,56 +95,75 @@
       cursor: pointer;
     }
 
-    /* Lista wielokrotnego wyboru partii */
-    .muscle-list {
+    /* Tabelka partii mięśniowych */
+    .muscle-table {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 14px;
       margin-bottom: 14px;
+    }
+    .muscle-group {
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.2);
+    }
+    .muscle-group-header {
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .muscle-group-header.push { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+    .muscle-group-header.pull { background: rgba(72, 219, 251, 0.2); color: #48dbfb; }
+    .muscle-group-header.legs { background: rgba(254, 202, 87, 0.2); color: #feca57; }
+    .muscle-group-header.core { background: rgba(162, 155, 254, 0.2); color: #a29bfe; }
+
+    .muscle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
     }
     .muscle-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
+      gap: 10px;
+      padding: 12px 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
       cursor: pointer;
       user-select: none;
-      transition: border-color 0.15s, background 0.15s;
+      transition: background 0.15s;
     }
-    .muscle-item:hover {
-      border-color: rgba(254, 202, 87, 0.4);
-      background: rgba(254, 202, 87, 0.06);
-    }
-    .muscle-item.selected {
-      border-color: #feca57;
-      background: rgba(254, 202, 87, 0.12);
-    }
+    .muscle-item:nth-child(2n) { border-right: none; }
+    .muscle-item:hover { background: rgba(255,255,255,0.04); }
+    .muscle-item.selected { background: rgba(254, 202, 87, 0.12); }
     .muscle-item input {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       margin: 0;
       accent-color: #feca57;
       flex-shrink: 0;
       cursor: pointer;
     }
     .muscle-item .icon {
-      width: 28px;
+      width: 22px;
       text-align: center;
-      font-size: 1.15rem;
+      font-size: 0.95rem;
       color: #feca57;
       flex-shrink: 0;
     }
     .muscle-item .name {
-      font-size: 0.95rem;
+      font-size: 0.82rem;
       font-weight: 500;
-      color: #eee;
+      color: #ddd;
+      line-height: 1.25;
     }
-    .muscle-item.selected .name {
-      color: #feca57;
-    }
+    .muscle-item.selected .name { color: #feca57; }
 
     .section-title {
       font-size: 0.85rem;
@@ -288,47 +307,100 @@
         <input type="text" id="exName" placeholder="Np. Przysiady">
 
         <label class="field">Partie mięśniowe (możesz wybrać kilka)</label>
-        <div class="muscle-list" id="muscleList">
-          <label class="muscle-item">
-            <input type="checkbox" name="muscle" value="Nogi">
-            <span class="icon"><i class="fas fa-shoe-prints"></i></span>
-            <span class="name">Nogi</span>
-          </label>
-          <label class="muscle-item">
-            <input type="checkbox" name="muscle" value="Klatka">
-            <span class="icon"><i class="fas fa-heart"></i></span>
-            <span class="name">Klatka</span>
-          </label>
-          <label class="muscle-item">
-            <input type="checkbox" name="muscle" value="Plecy">
-            <span class="icon"><i class="fas fa-child"></i></span>
-            <span class="name">Plecy</span>
-          </label>
-          <label class="muscle-item">
-            <input type="checkbox" name="muscle" value="Barki">
-            <span class="icon"><i class="fas fa-expand-arrows-alt"></i></span>
-            <span class="name">Barki</span>
-          </label>
-          <label class="muscle-item">
-            <input type="checkbox" name="muscle" value="Biceps">
-            <span class="icon"><i class="fas fa-hand-fist"></i></span>
-            <span class="name">Biceps</span>
-          </label>
-          <label class="muscle-item">
-            <input type="checkbox" name="muscle" value="Triceps">
-            <span class="icon"><i class="fas fa-hand-back-fist"></i></span>
-            <span class="name">Triceps</span>
-          </label>
-          <label class="muscle-item">
-            <input type="checkbox" name="muscle" value="Brzuch">
-            <span class="icon"><i class="fas fa-circle"></i></span>
-            <span class="name">Brzuch</span>
-          </label>
-          <label class="muscle-item">
-            <input type="checkbox" name="muscle" value="Całe ciało">
-            <span class="icon"><i class="fas fa-person"></i></span>
-            <span class="name">Całe ciało</span>
-          </label>
+
+        <div class="muscle-table">
+
+          <!-- PUSH -->
+          <div class="muscle-group">
+            <div class="muscle-group-header push">
+              <i class="fas fa-hand-point-up"></i> Push
+            </div>
+            <div class="muscle-grid">
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Klatka piersiowa">
+                <span class="icon"><i class="fas fa-heart"></i></span>
+                <span class="name">Klatka piersiowa</span>
+              </label>
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Barki">
+                <span class="icon"><i class="fas fa-expand-arrows-alt"></i></span>
+                <span class="name">Barki</span>
+              </label>
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Triceps">
+                <span class="icon"><i class="fas fa-hand-back-fist"></i></span>
+                <span class="name">Triceps</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- PULL -->
+          <div class="muscle-group">
+            <div class="muscle-group-header pull">
+              <i class="fas fa-hand-point-down"></i> Pull
+            </div>
+            <div class="muscle-grid">
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Plecy">
+                <span class="icon"><i class="fas fa-child"></i></span>
+                <span class="name">Plecy</span>
+              </label>
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Biceps">
+                <span class="icon"><i class="fas fa-hand-fist"></i></span>
+                <span class="name">Biceps</span>
+              </label>
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Przedramiona">
+                <span class="icon"><i class="fas fa-hands"></i></span>
+                <span class="name">Przedramiona</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- NOGI -->
+          <div class="muscle-group">
+            <div class="muscle-group-header legs">
+              <i class="fas fa-shoe-prints"></i> Nogi
+            </div>
+            <div class="muscle-grid">
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Czworogłowy uda">
+                <span class="icon"><i class="fas fa-person-walking"></i></span>
+                <span class="name">Czworogłowy uda</span>
+              </label>
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Kulszowo-goleniowe">
+                <span class="icon"><i class="fas fa-person-running"></i></span>
+                <span class="name">Kulszowo-goleniowe</span>
+              </label>
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Biodra">
+                <span class="icon"><i class="fas fa-arrows-alt-h"></i></span>
+                <span class="name">Biodra</span>
+              </label>
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Łydki">
+                <span class="icon"><i class="fas fa-shoe-prints"></i></span>
+                <span class="name">Łydki</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- KORPUS -->
+          <div class="muscle-group">
+            <div class="muscle-group-header core">
+              <i class="fas fa-circle"></i> Korpus
+            </div>
+            <div class="muscle-grid">
+              <label class="muscle-item">
+                <input type="checkbox" name="muscle" value="Mięśnie brzucha">
+                <span class="icon"><i class="fas fa-circle-notch"></i></span>
+                <span class="name">Mięśnie brzucha</span>
+              </label>
+            </div>
+          </div>
+
         </div>
 
         <label class="field" for="exDesc">Opis / wskazówki</label>
@@ -366,7 +438,6 @@
       console.error(e);
     }
 
-    // Podświetlanie zaznaczonych partii
     document.querySelectorAll('.muscle-item input').forEach(function(cb) {
       cb.addEventListener('change', function() {
         cb.closest('.muscle-item').classList.toggle('selected', cb.checked);
