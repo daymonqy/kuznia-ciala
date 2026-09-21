@@ -49,6 +49,20 @@
             color: #fff;
             margin-bottom: 4px;
         }
+        .switch-link {
+            margin-top: 18px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .switch-link a {
+            color: #48dbfb;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .switch-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -65,24 +79,26 @@
 
             <!-- Zakładki -->
             <div id="auth-tabs" class="auth-tabs">
-                <button type="button" id="tab-login" class="auth-tab active" onclick="showLoginForm()">Logowanie</button>
-                <button type="button" id="tab-register" class="auth-tab" onclick="showRegisterForm()">Rejestracja</button>
+                <button type="button" id="tab-login" class="auth-tab" onclick="showLoginForm()">Logowanie</button>
+                <button type="button" id="tab-register" class="auth-tab active" onclick="showRegisterForm()">Rejestracja</button>
             </div>
 
             <!-- Formularz logowania -->
-            <form id="form-login" class="auth-form" style="display: block;">
+            <form id="form-login" class="auth-form" style="display: none;">
                 <input type="email" id="login-email" placeholder="Adres e-mail" required autocomplete="email">
                 <input type="password" id="login-password" placeholder="Hasło" required autocomplete="current-password">
                 <button type="submit">Zaloguj się</button>
+                <p class="switch-link">Nie masz konta? <a onclick="showRegisterForm()">Zarejestruj się</a></p>
             </form>
 
-            <!-- Formularz rejestracji -->
-            <form id="form-register" class="auth-form" style="display: none;">
+            <!-- Formularz rejestracji (domyślnie widoczny) -->
+            <form id="form-register" class="auth-form" style="display: block;">
                 <input type="text" id="register-name" placeholder="Imię" required autocomplete="given-name" minlength="2">
                 <input type="email" id="register-email" placeholder="Adres e-mail" required autocomplete="email">
                 <input type="password" id="register-password" placeholder="Hasło (min. 6 znaków)" required autocomplete="new-password">
                 <input type="password" id="register-password2" placeholder="Powtórz hasło" required autocomplete="new-password">
                 <button type="submit">Utwórz konto</button>
+                <p class="switch-link">Masz już konto? <a onclick="showLoginForm()">Zaloguj się</a></p>
             </form>
 
             <!-- Panel zalogowanego użytkownika -->
