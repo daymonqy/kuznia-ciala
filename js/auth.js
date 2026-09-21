@@ -42,14 +42,14 @@ function updateUIForAuth(user) {
       if (nameEl && user.displayName) nameEl.textContent = user.displayName;
     }
   } else {
-    // Niezalogowany
+    // Niezalogowany – domyślnie rejestracja
     if (authStatus) {
       authStatus.innerHTML = `<i class="fas fa-user"></i> Gość`;
       authStatus.classList.remove('logged-in');
     }
     if (userPanel) userPanel.style.display = 'none';
     if (authTabs) authTabs.style.display = 'flex';
-    showLoginForm();
+    showRegisterForm();
   }
 }
 
