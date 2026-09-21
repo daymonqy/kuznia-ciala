@@ -23,6 +23,12 @@
       text-align: center;
       font-size: 1.5rem;
       color: #a29bfe;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      font-size: 0.9rem;
       margin-bottom: 24px;
     }
     .tabs {
@@ -48,16 +54,20 @@
       background: rgba(72, 219, 251, 0.25);
       color: #48dbfb;
     }
-    .box {
-      display: none;
-    }
-    .box.show {
+    .box { display: none; }
+    .box.show { display: block; }
+    label {
       display: block;
+      text-align: left;
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-bottom: 6px;
+      margin-left: 4px;
     }
     input {
       width: 100%;
       padding: 14px 16px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 12px;
       background: rgba(255,255,255,0.06);
@@ -88,10 +98,7 @@
     .msg.ok { color: #00b894; }
     .msg.err { color: #e17055; }
     .msg.info { color: #48dbfb; }
-    .profile {
-      display: none;
-      text-align: center;
-    }
+    .profile { display: none; text-align: center; }
     .profile.show { display: block; }
     .avatar {
       width: 80px; height: 80px;
@@ -118,6 +125,7 @@
       padding: 6px 14px; border-radius: 20px;
       font-size: 0.75rem; color: #888;
       border: 1px solid rgba(255,255,255,0.08);
+      z-index: 10;
     }
     .status.on { color: #48dbfb; border-color: rgba(72,219,251,0.3); }
     .nav {
@@ -125,6 +133,7 @@
       background: rgba(15,15,15,0.95);
       border-top: 1px solid rgba(255,255,255,0.1);
       display: flex; justify-content: space-around; align-items: center;
+      z-index: 10;
     }
     .nav a {
       display: flex; flex-direction: column; align-items: center;
@@ -139,32 +148,44 @@
 
   <div class="wrap">
     <h1>Twoje konto</h1>
+    <p class="subtitle" id="subtitle">Utwórz nowe konto</p>
 
-    <!-- Zakładki -->
     <div class="tabs" id="tabs">
       <button type="button" id="btnTabReg" class="on" onclick="goRegister()">Rejestracja</button>
       <button type="button" id="btnTabLog" onclick="goLogin()">Logowanie</button>
     </div>
 
-    <!-- REJESTRACJA -->
+    <!-- REJESTRACJA: imię + e-mail + hasło + powtórz hasło -->
     <div class="box show" id="boxRegister">
-      <input type="text" id="regName" placeholder="Imię" autocomplete="given-name">
-      <input type="email" id="regEmail" placeholder="Adres e-mail" autocomplete="email">
-      <input type="password" id="regPass" placeholder="Hasło (min. 6 znaków)" autocomplete="new-password">
-      <input type="password" id="regPass2" placeholder="Powtórz hasło" autocomplete="new-password">
+      <label for="regName">Imię</label>
+      <input type="text" id="regName" placeholder="Np. Jan" autocomplete="given-name">
+
+      <label for="regEmail">E-mail</label>
+      <input type="email" id="regEmail" placeholder="jan@email.com" autocomplete="email">
+
+      <label for="regPass">Hasło</label>
+      <input type="password" id="regPass" placeholder="Min. 6 znaków" autocomplete="new-password">
+
+      <label for="regPass2">Powtórz hasło</label>
+      <input type="password" id="regPass2" placeholder="Wpisz hasło ponownie" autocomplete="new-password">
+
       <button type="button" class="btn" onclick="doRegister()">Utwórz konto</button>
       <div class="msg" id="regMsg"></div>
     </div>
 
-    <!-- LOGOWANIE -->
+    <!-- LOGOWANIE: tylko e-mail + hasło -->
     <div class="box" id="boxLogin">
-      <input type="email" id="logEmail" placeholder="Adres e-mail" autocomplete="email">
-      <input type="password" id="logPass" placeholder="Hasło" autocomplete="current-password">
+      <label for="logEmail">E-mail</label>
+      <input type="email" id="logEmail" placeholder="jan@email.com" autocomplete="email">
+
+      <label for="logPass">Hasło</label>
+      <input type="password" id="logPass" placeholder="Twoje hasło" autocomplete="current-password">
+
       <button type="button" class="btn" onclick="doLogin()">Zaloguj się</button>
       <div class="msg" id="logMsg"></div>
     </div>
 
-    <!-- PROFIL -->
+    <!-- PROFIL po zalogowaniu -->
     <div class="profile" id="boxProfile">
       <div class="avatar"><i class="fas fa-user"></i></div>
       <div class="pname" id="pName">—</div>
@@ -186,18 +207,20 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script>
-    // ---- przełączanie widoków (działa bez Firebase) ----
     function goRegister() {
       document.getElementById('boxRegister').classList.add('show');
       document.getElementById('boxLogin').classList.remove('show');
       document.getElementById('btnTabReg').classList.add('on');
       document.getElementById('btnTabLog').classList.remove('on');
+      document.getElementById('subtitle').textContent = 'Utwórz nowe konto';
     }
+
     function goLogin() {
       document.getElementById('boxLogin').classList.add('show');
       document.getElementById('boxRegister').classList.remove('show');
       document.getElementById('btnTabLog').classList.add('on');
       document.getElementById('btnTabReg').classList.remove('on');
+      document.getElementById('subtitle').textContent = 'Zaloguj się na swoje konto';
     }
 
     function setMsg(id, text, type) {
@@ -206,15 +229,13 @@
       el.className = 'msg ' + (type || '');
     }
 
-    // ---- Firebase ----
     var auth = null;
     var db = null;
-
     try {
       auth = firebase.auth();
       db = firebase.firestore();
     } catch (e) {
-      console.error('Firebase init error', e);
+      console.error('Firebase:', e);
     }
 
     if (auth) {
@@ -224,12 +245,14 @@
         var boxLog = document.getElementById('boxLogin');
         var boxProf = document.getElementById('boxProfile');
         var status = document.getElementById('status');
+        var subtitle = document.getElementById('subtitle');
 
         if (user) {
           tabs.style.display = 'none';
           boxReg.classList.remove('show');
           boxLog.classList.remove('show');
           boxProf.classList.add('show');
+          subtitle.textContent = 'Jesteś zalogowany';
           document.getElementById('pName').textContent = user.displayName || 'Użytkownik';
           document.getElementById('pEmail').textContent = user.email || '';
           status.innerHTML = '<i class="fas fa-user-check"></i> ' + (user.displayName || user.email);
@@ -252,9 +275,9 @@
 
       if (name.length < 2) { setMsg('regMsg', 'Podaj imię (min. 2 znaki)', 'err'); return; }
       if (!email) { setMsg('regMsg', 'Podaj e-mail', 'err'); return; }
-      if (pass.length < 6) { setMsg('regMsg', 'Hasło min. 6 znaków', 'err'); return; }
+      if (pass.length < 6) { setMsg('regMsg', 'Hasło musi mieć min. 6 znaków', 'err'); return; }
       if (pass !== pass2) { setMsg('regMsg', 'Hasła nie są takie same', 'err'); return; }
-      if (!auth) { setMsg('regMsg', 'Błąd: Firebase nie działa', 'err'); return; }
+      if (!auth) { setMsg('regMsg', 'Błąd połączenia z Firebase', 'err'); return; }
 
       setMsg('regMsg', 'Tworzenie konta...', 'info');
 
@@ -279,7 +302,7 @@
           var m = {
             'auth/email-already-in-use': 'Ten e-mail jest już zajęty',
             'auth/invalid-email': 'Nieprawidłowy e-mail',
-            'auth/weak-password': 'Hasło za słabe (min. 6 znaków)',
+            'auth/weak-password': 'Hasło za słabe',
             'auth/operation-not-allowed': 'Włącz Email/Password w Firebase Console',
             'auth/network-request-failed': 'Brak internetu'
           };
@@ -290,18 +313,24 @@
     function doLogin() {
       var email = document.getElementById('logEmail').value.trim();
       var pass = document.getElementById('logPass').value;
-      if (!email || !pass) { setMsg('logMsg', 'Wypełnij e-mail i hasło', 'err'); return; }
-      if (!auth) { setMsg('logMsg', 'Błąd: Firebase nie działa', 'err'); return; }
+
+      if (!email) { setMsg('logMsg', 'Podaj e-mail', 'err'); return; }
+      if (!pass) { setMsg('logMsg', 'Podaj hasło', 'err'); return; }
+      if (!auth) { setMsg('logMsg', 'Błąd połączenia z Firebase', 'err'); return; }
 
       setMsg('logMsg', 'Logowanie...', 'info');
+
       auth.signInWithEmailAndPassword(email, pass)
-        .then(function() { setMsg('logMsg', 'Zalogowano!', 'ok'); })
+        .then(function() {
+          setMsg('logMsg', 'Zalogowano!', 'ok');
+        })
         .catch(function(err) {
           var m = {
             'auth/user-not-found': 'Nie ma takiego konta',
             'auth/wrong-password': 'Błędne hasło',
             'auth/invalid-credential': 'Błędny e-mail lub hasło',
-            'auth/invalid-email': 'Nieprawidłowy e-mail'
+            'auth/invalid-email': 'Nieprawidłowy e-mail',
+            'auth/too-many-requests': 'Zbyt wiele prób – spróbuj później'
           };
           setMsg('logMsg', m[err.code] || err.message || 'Błąd logowania', 'err');
         });
