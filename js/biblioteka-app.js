@@ -99,13 +99,13 @@ async function loadFromAccount(){
       },{merge:true});
     }
     renderPrograms();renderExercises();
-    toast("Konto wczytane ("+exercises.length+" ćw.)","ok");
+    toast("Konto wczytane ("+exercises.length+" cw.)","ok");
     clearErr();
   }catch(e){
     console.error(e);
     var hint = (typeof firestoreOfflineHint==="function") ? firestoreOfflineHint(e) : (e.message||"");
     showErr(hint);
-    toast("Błąd odczytu konta","err");
+    toast("Blad odczytu konta","err");
   }
 }
 
@@ -165,7 +165,7 @@ function editProgram(id){
 
 function showExercisePicker(){
   if(!exercises.length){
-    toast("Najpierw dodaj ćwiczenia w zakładce Ćwiczenia","err");
+    toast("Najpierw dodaj cwiczenia w zakladce Cwiczenia","err");
     return;
   }
   document.getElementById("exPickerBox").classList.add("show");
@@ -195,7 +195,7 @@ function renderPickerResults(){
   });
   var el=document.getElementById("pickerResults");
   if(!list.length){
-    el.innerHTML='<div class="ex-pick-empty">Brak ćwiczeń do dodania</div>';
+    el.innerHTML='<div class="ex-pick-empty">Brak cwiczen do dodania</div>';
     return;
   }
   el.innerHTML=list.map(function(ex){
@@ -210,7 +210,7 @@ function addExerciseToDraft(id){
   var ex=exercises.find(function(e){return e.id===id;});
   if(!ex)return;
   if(draftProgramExercises.some(function(d){return d.id===id;})){
-    toast("To ćwiczenie już jest w programie","info");
+    toast("To cwiczenie juz jest w programie","info");
     return;
   }
   draftProgramExercises.push({
@@ -250,7 +250,7 @@ function renderDraftProgramExercises(){
   var el=document.getElementById("draftExList");
   if(!el)return;
   if(!draftProgramExercises.length){
-    el.innerHTML='<div class="ex-pick-empty">Brak ćwiczeń w programie.<br>Kliknij „Dodaj ćwiczenie”.</div>';
+    el.innerHTML='<div class="ex-pick-empty">Brak cwiczen w programie.<br>Kliknij Dodaj cwiczenie.</div>';
     return;
   }
   el.innerHTML=draftProgramExercises.map(function(d,i){
@@ -263,15 +263,15 @@ function renderDraftProgramExercises(){
         '<span class="draft-num">'+(i+1)+'.</span>'+
         '<div class="draft-name">'+escapeHtml(d.name)+'</div>'+
         '<div class="draft-order">'+
-          '<button type="button" title="W górę" onclick="moveDraft('+i+',-1)"'+upDis+'><i class="fas fa-chevron-up"></i></button>'+
-          '<button type="button" title="W dół" onclick="moveDraft('+i+',1)"'+downDis+'><i class="fas fa-chevron-down"></i></button>'+
-          '<button type="button" class="draft-remove" title="Usuń" onclick="removeFromDraft('+i+')"><i class="fas fa-times"></i></button>'+
+          '<button type="button" title="W gore" onclick="moveDraft('+i+',-1)"'+upDis+'><i class="fas fa-chevron-up"></i></button>'+
+          '<button type="button" title="W dol" onclick="moveDraft('+i+',1)"'+downDis+'><i class="fas fa-chevron-down"></i></button>'+
+          '<button type="button" class="draft-remove" title="Usun" onclick="removeFromDraft('+i+')"><i class="fas fa-times"></i></button>'+
         '</div>'+
       '</div>'+
       '<div class="draft-meta">'+escapeHtml((d.muscles||[]).join(", "))+'</div>'+
       '<div class="draft-sets">'+
         '<label>Serie <input type="number" min="1" max="99" value="'+setsVal+'" onchange="updateDraftField('+i+',\'sets\',this.value)" oninput="updateDraftField('+i+',\'sets\',this.value)"></label>'+
-        '<label>Powtórzenia <input type="text" value="'+repsVal+'" placeholder="np. 8-12" onchange="updateDraftField('+i+',\'reps\',this.value)" oninput="updateDraftField('+i+',\'reps\',this.value)"></label>'+
+        '<label>Powtorzenia <input type="text" value="'+repsVal+'" placeholder="np. 8-12" onchange="updateDraftField('+i+',\'reps\',this.value)" oninput="updateDraftField('+i+',\'reps\',this.value)"></label>'+
       '</div>'+
     '</div>';
   }).join("");
@@ -281,8 +281,8 @@ async function saveProgram(){
   if(!requireAuth())return;
   var name=document.getElementById("progName").value.trim();
   var desc=document.getElementById("progDesc").value.trim();
-  if(!name){toast("Podaj nazwę programu","err");return;}
-  if(!draftProgramExercises.length){toast("Dodaj przynajmniej jedno ćwiczenie","err");return;}
+  if(!name){toast("Podaj nazwe programu","err");return;}
+  if(!draftProgramExercises.length){toast("Dodaj przynajmniej jedno cwiczenie","err");return;}
   var selected=draftProgramExercises.map(function(d){
     return {id:d.id,name:d.name,muscles:d.muscles||[],sets:d.sets,reps:d.reps};
   });
@@ -307,7 +307,7 @@ async function saveProgram(){
     await persistAll();
     renderPrograms();
     closeProgramForm();
-    toast(isEdit?"Program zaktualizowany ✓":"Program zapisany ✓","ok");
+    toast(isEdit?"Program zaktualizowany":"Program zapisany","ok");
     clearErr();
   }catch(e){
     console.error(e);
@@ -319,41 +319,41 @@ async function saveProgram(){
 
 async function deleteProgram(id){
   if(!requireAuth())return;
-  if(!confirm("Usunąć program z konta?"))return;
+  if(!confirm("Usunac program z konta?"))return;
   if(editingProgramId===id)closeProgramForm();
   var backup=programs.slice();
   programs=programs.filter(function(p){return p.id!==id;});
-  try{await persistAll();renderPrograms();toast("Usunięto","info");}
-  catch(e){programs=backup;renderPrograms();showErr("Usuwanie nieudane: "+e.message);toast("Błąd","err");}
+  try{await persistAll();renderPrograms();toast("Usunieto","info");}
+  catch(e){programs=backup;renderPrograms();showErr("Usuwanie nieudane: "+e.message);toast("Blad","err");}
 }
 
 function renderPrograms(){
   var el=document.getElementById("listProgram");
-  if(!programs.length){el.innerHTML='<div class="empty">Brak programów na koncie</div>';return;}
+  if(!programs.length){el.innerHTML='<div class="empty">Brak programow na koncie</div>';return;}
   el.innerHTML=programs.map(function(p){
     var list="";
     if(p.exercises&&p.exercises.length){
       list='<ul class="card-ex-list">'+p.exercises.map(function(x){
         var sr="";
         if(x.sets!=null||x.reps!=null){
-          sr=" — "+(x.sets!=null?x.sets+"×":"")+(x.reps!=null?x.reps:"");
+          sr=" - "+(x.sets!=null?x.sets+"x":"")+(x.reps!=null?x.reps:"");
         }
         return "<li>"+escapeHtml(x.name)+escapeHtml(sr)+"</li>";
       }).join("")+"</ul>";
     }
     return '<div class="card"><div class="card-title">'+escapeHtml(p.name)+
-      '</div><div class="card-meta">'+(p.exercises?p.exercises.length:0)+" ćw. · "+formatDate(p.updatedAt||p.createdAt)+
+      '</div><div class="card-meta">'+(p.exercises?p.exercises.length:0)+" cw. - "+formatDate(p.updatedAt||p.createdAt)+
       "</div>"+(p.description?'<div class="card-desc">'+escapeHtml(p.description)+"</div>":"")+list+
       '<div class="card-actions"><button type="button" class="btn-edit" onclick="editProgram(\''+p.id+
       '\')"><i class="fas fa-pen"></i> Edytuj</button><button type="button" class="btn-del" onclick="deleteProgram(\''+p.id+
-      '\')">Usuń</button></div></div>';
+      '\')">Usun</button></div></div>';
   }).join("");
 }
 
 function setExerciseFormMode(isEdit){
   var title=document.querySelector("#formExercise h3");
   var btn=document.getElementById("btnSaveEx");
-  if(title) title.textContent = isEdit ? "Edytuj ćwiczenie" : "Nowe ćwiczenie";
+  if(title) title.textContent = isEdit ? "Edytuj cwiczenie" : "Nowe cwiczenie";
   if(btn) btn.textContent = isEdit ? "Zapisz zmiany" : "Zapisz na konto";
 }
 
@@ -383,7 +383,7 @@ function closeExerciseForm(){
 function editExercise(id){
   if(!requireAuth())return;
   var ex=exercises.find(function(e){return e.id===id;});
-  if(!ex){toast("Nie znaleziono ćwiczenia","err");return;}
+  if(!ex){toast("Nie znaleziono cwiczenia","err");return;}
   editingExerciseId=id;
   setExerciseFormMode(true);
   document.getElementById("exName").value=ex.name||"";
@@ -406,7 +406,7 @@ function editExercise(id){
 
 function onMediaSelect(ev,type){
   var f=ev.target.files&&ev.target.files[0];if(!f)return;
-  if(f.size>MAX_MEDIA_MB*1024*1024){toast("Plik za duży (max "+MAX_MEDIA_MB+" MB)","err");ev.target.value="";return;}
+  if(f.size>MAX_MEDIA_MB*1024*1024){toast("Plik za duzy (max "+MAX_MEDIA_MB+" MB)","err");ev.target.value="";return;}
   var r=new FileReader();
   r.onload=function(e){
     pendingMedia={type:type,dataUrl:e.target.result,name:f.name};
@@ -480,8 +480,8 @@ async function saveExercise(){
   var name=document.getElementById("exName").value.trim();
   var muscles=getSelectedMuscles();
   var desc=document.getElementById("exDesc").value.trim();
-  if(!name){toast("Podaj nazwę","err");return;}
-  if(!muscles.length){toast("Wybierz partię mięśniową","err");return;}
+  if(!name){toast("Podaj nazwe","err");return;}
+  if(!muscles.length){toast("Wybierz partie miesniowa","err");return;}
   var btn=document.getElementById("btnSaveEx");
   btn.disabled=true;btn.textContent="Zapisywanie...";
   var isEdit=!!editingExerciseId;
@@ -489,7 +489,7 @@ async function saveExercise(){
   try{
     if(isEdit){
       var idx=exercises.findIndex(function(e){return e.id===editingExerciseId;});
-      if(idx===-1)throw new Error("Ćwiczenie nie istnieje");
+      if(idx===-1)throw new Error("Cwiczenie nie istnieje");
       backup=JSON.parse(JSON.stringify(exercises[idx]));
       var updated={
         id:editingExerciseId,name:name,muscles:muscles,description:desc,
@@ -518,7 +518,7 @@ async function saveExercise(){
     renderExercises();renderPrograms();
     closeExerciseForm();
     clearErr();
-    toast(isEdit?"Zmiany zapisane ✓":"Ćwiczenie zapisane na koncie ✓","ok");
+    toast(isEdit?"Zmiany zapisane":"Cwiczenie zapisane na koncie","ok");
   }catch(e){
     if(isEdit&&backup){
       var i=exercises.findIndex(function(e){return e.id===editingExerciseId;});
@@ -526,7 +526,7 @@ async function saveExercise(){
     }
     console.error(e);
     var msg="Zapis nieudany. ";
-    if(e.code==="permission-denied")msg="Firestore: brak uprawnień.";
+    if(e.code==="permission-denied")msg="Firestore: brak uprawnien.";
     else if(e.message&&e.message.indexOf("offline")!==-1)msg=(typeof firestoreOfflineHint==="function")?firestoreOfflineHint(e):e.message;
     else msg+=(e.code||"")+" "+(e.message||"");
     showErr(msg);
@@ -538,7 +538,7 @@ async function saveExercise(){
 
 async function deleteExercise(id){
   if(!requireAuth())return;
-  if(!confirm("Usunąć ćwiczenie z konta?"))return;
+  if(!confirm("Usunac cwiczenie z konta?"))return;
   if(editingExerciseId===id)closeExerciseForm();
   var backupEx=exercises.slice(),backupPr=programs.slice();
   exercises=exercises.filter(function(e){return e.id!==id;});
@@ -550,18 +550,20 @@ async function deleteExercise(id){
   try{
     await persistAll();
     renderExercises();renderPrograms();renderDraftProgramExercises();
-    toast("Usunięto","info");
+    toast("Usunieto","info");
   }catch(e){
     exercises=backupEx;programs=backupPr;
     renderExercises();renderPrograms();
     showErr("Usuwanie nieudane: "+e.message);
-    toast("Błąd","err");
+    toast("Blad","err");
   }
 }
 
 function escapeHtml(s){
   if(!s)return"";
-  return String(s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");
+  var d=document.createElement("div");
+  d.textContent=String(s);
+  return d.innerHTML;
 }
 function formatDate(iso){
   if(!iso)return"";
@@ -575,7 +577,7 @@ function renderExercises(){
   var fc=document.getElementById("filterCount");
   if(fc)fc.textContent=filters.length?("Filtr: "+filtered.length+" / "+exercises.length):(exercises.length?("Na koncie: "+exercises.length):"");
   if(!filtered.length){
-    el.innerHTML='<div class="empty">'+(exercises.length?"Brak wyników filtra":"Brak ćwiczeń – utwórz pierwsze")+"</div>";
+    el.innerHTML='<div class="empty">'+(exercises.length?"Brak wynikow filtra":"Brak cwiczen - utworz pierwsze")+"</div>";
     return;
   }
   el.innerHTML=filtered.map(function(e){
@@ -586,11 +588,11 @@ function renderExercises(){
         : '<div class="card-media"><video src="'+e.media.dataUrl+'" controls></div>';
     }
     return '<div class="card"><div class="card-title">'+escapeHtml(e.name)+
-      '</div><div class="card-meta">'+escapeHtml((e.muscles||[]).join(", "))+" · "+formatDate(e.updatedAt||e.createdAt)+
+      '</div><div class="card-meta">'+escapeHtml((e.muscles||[]).join(", "))+" - "+formatDate(e.updatedAt||e.createdAt)+
       "</div>"+media+(e.description?'<div class="card-desc">'+escapeHtml(e.description)+"</div>":"")+
       '<div class="card-actions"><button type="button" class="btn-edit" onclick="editExercise(\''+e.id+
       '\')"><i class="fas fa-pen"></i> Edytuj</button><button type="button" class="btn-del" onclick="deleteExercise(\''+e.id+
-      '\')">Usuń</button></div></div>';
+      '\')">Usun</button></div></div>';
   }).join("");
 }
 
