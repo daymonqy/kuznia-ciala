@@ -1,1 +1,235 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuźnia Ciała - Biblioteka</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f0f0f,#1a1a2e,#16213e);color:#fff;min-height:100vh;padding-bottom:90px}
+.wrap{max-width:480px;margin:0 auto;padding:20px 16px}
+h1{text-align:center;font-size:1.5rem;color:#feca57;margin:12px 0 20px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(255,255,255,.05);border-radius:12px;padding:4px}
+.tabs button{flex:1;padding:12px;border:none;border-radius:10px;background:transparent;color:#888;font-size:.95rem;font-weight:600;cursor:pointer}
+.tabs button.on{background:rgba(254,202,87,.2);color:#feca57}
+.panel{display:none}.panel.show{display:block}
+.btn-create{width:100%;padding:14px;margin-bottom:16px;border:1px dashed rgba(254,202,87,.5);border-radius:12px;background:rgba(254,202,87,.08);color:#feca57;font-size:.95rem;font-weight:600;cursor:pointer}
+.form-card{display:none;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px;margin-bottom:24px}
+.form-card.show{display:block}
+.form-card h3{font-size:1.05rem;margin-bottom:14px;color:#feca57}
+label.field{display:block;font-size:.8rem;color:#aaa;margin-bottom:6px}
+input[type=text],textarea{width:100%;padding:12px 14px;margin-bottom:12px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;outline:none;font-family:inherit}
+textarea{min-height:80px;resize:vertical}
+.form-actions{display:flex;gap:10px;margin-top:4px}
+.btn-save{flex:1;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#feca57,#ff9f43);color:#0f0f0f;font-weight:700;cursor:pointer}
+.btn-cancel{flex:1;padding:14px;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:transparent;color:#aaa;font-weight:600;cursor:pointer}
+.media-box{border:1px dashed rgba(254,202,87,.4);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;background:rgba(254,202,87,.05)}
+.media-box input[type=file]{display:none}
+.media-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.media-btns label{padding:10px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#eee;font-size:.85rem;cursor:pointer;font-weight:600}
+.media-preview{margin-top:12px;display:none}.media-preview.show{display:block}
+.media-preview img,.media-preview video{max-width:100%;max-height:200px;border-radius:10px;background:#000}
+.media-remove{margin-top:8px;padding:6px 12px;border-radius:8px;border:1px solid rgba(225,112,85,.5);background:transparent;color:#e17055;font-size:.8rem;cursor:pointer}
+.filter-box{margin-bottom:16px;border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;background:rgba(0,0,0,.2)}
+.filter-header{padding:12px 14px;font-size:.85rem;font-weight:600;color:#feca57;display:flex;justify-content:space-between;align-items:center;background:rgba(254,202,87,.08)}
+.filter-header button{background:none;border:none;color:#888;font-size:.75rem;cursor:pointer;text-decoration:underline}
+.filter-body{padding:10px}
+.muscle-table{display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
+.muscle-group{border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;background:rgba(0,0,0,.15)}
+.muscle-group-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:6px}
+.muscle-group-header.push{background:rgba(255,107,107,.2);color:#ff6b6b}
+.muscle-group-header.pull{background:rgba(72,219,251,.2);color:#48dbfb}
+.muscle-group-header.legs{background:rgba(254,202,87,.2);color:#feca57}
+.muscle-group-header.core{background:rgba(162,155,254,.2);color:#a29bfe}
+.muscle-grid{display:grid;grid-template-columns:1fr 1fr}
+.muscle-item{display:flex;align-items:center;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.06);cursor:pointer;user-select:none}
+.muscle-item:nth-child(2n){border-right:none}
+.muscle-item.selected{background:rgba(254,202,87,.12)}
+.muscle-item input{width:15px;height:15px;margin:0;accent-color:#feca57;flex-shrink:0;cursor:pointer}
+.muscle-item .icon{width:20px;text-align:center;font-size:.9rem;color:#feca57;flex-shrink:0}
+.muscle-item .name{font-size:.78rem;font-weight:500;color:#ddd;line-height:1.2}
+.muscle-item.selected .name{color:#feca57}
+.filter-count{font-size:.8rem;color:#888;margin-bottom:12px;text-align:center}
+.ex-pick-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:280px;overflow-y:auto}
+.ex-pick-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);cursor:pointer}
+.ex-pick-item.selected{border-color:#feca57;background:rgba(254,202,87,.12)}
+.ex-pick-item input{width:16px;height:16px;margin:0;accent-color:#feca57;flex-shrink:0}
+.ex-pick-name{font-size:.9rem;font-weight:600;color:#eee}
+.ex-pick-meta{font-size:.75rem;color:#888}
+.ex-pick-empty{text-align:center;color:#666;padding:16px;font-size:.85rem;background:rgba(255,255,255,.03);border-radius:10px}
+.section-title{font-size:.85rem;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;text-align:left}
+.card-title{font-weight:700;font-size:1rem;margin-bottom:4px}
+.card-meta{font-size:.8rem;color:#888;margin-bottom:6px}
+.card-desc{font-size:.85rem;color:#bbb;line-height:1.4}
+.card-media{margin:10px 0}
+.card-media img,.card-media video{max-width:100%;max-height:180px;border-radius:10px;background:#000}
+.card-ex-list{margin-top:8px}.card-ex-list li{font-size:.85rem;color:#ccc;margin-bottom:4px;list-style:none}.card-ex-list li::before{content:"• ";color:#feca57}
+.card-actions{margin-top:10px}
+.card-actions button{padding:6px 12px;border-radius:8px;border:1px solid rgba(225,112,85,.4);background:transparent;color:#e17055;font-size:.75rem;cursor:pointer}
+.empty{text-align:center;color:#666;padding:24px 16px;font-size:.9rem;background:rgba(255,255,255,.03);border-radius:12px}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);padding:12px 20px;border-radius:12px;font-size:.9rem;z-index:2000;opacity:0;transition:all .3s;max-width:90%;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:#00b894;color:#fff}.toast.err{background:#e17055;color:#fff}.toast.info{background:#0984e3;color:#fff}
+.status{position:fixed;top:12px;right:12px;background:rgba(15,15,15,.9);padding:6px 14px;border-radius:20px;font-size:.75rem;color:#888;border:1px solid rgba(255,255,255,.08);z-index:10;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status.on{color:#48dbfb;border-color:rgba(72,219,251,.3)}
+.nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:rgba(15,15,15,.95);border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-around;align-items:center;z-index:1000}
+.nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#888;font-size:.7rem;width:20%}
+.nav a i{font-size:1.4rem;margin-bottom:4px}.nav a.active{color:#48dbfb}
+</style>
+</head>
+<body>
+<div class="status" id="status"><i class="fas fa-user"></i> Gość</div>
+<div class="toast" id="toast"></div>
+<div class="wrap">
+<h1>Biblioteka</h1>
+<div class="tabs">
+<button type="button" id="tabProgram" class="on" onclick="showProgram()">Program</button>
+<button type="button" id="tabCwiczenia" onclick="showCwiczenia()">Ćwiczenia</button>
+</div>
+
+<div class="panel show" id="panelProgram">
+<button type="button" class="btn-create" onclick="openProgramForm()"><i class="fas fa-plus"></i> Utwórz program</button>
+<div class="form-card" id="formProgram">
+<h3><i class="fas fa-plus-circle"></i> Nowy program</h3>
+<label class="field" for="progName">Nazwa programu</label>
+<input type="text" id="progName" placeholder="Np. Siła pełnego ciała">
+<label class="field" for="progDesc">Opis</label>
+<textarea id="progDesc" placeholder="Cel, uwagi..."></textarea>
+<label class="field">Ćwiczenia z biblioteki</label>
+<div class="ex-pick-list" id="exPickList"><div class="ex-pick-empty">Najpierw dodaj ćwiczenia w zakładce Ćwiczenia</div></div>
+<div class="form-actions">
+<button type="button" class="btn-cancel" onclick="closeProgramForm()">Anuluj</button>
+<button type="button" class="btn-save" onclick="saveProgram()">Zapisz</button>
+</div>
+</div>
+<div class="section-title">Twoje programy</div>
+<div class="list" id="listProgram"></div>
+</div>
+
+<div class="panel" id="panelCwiczenia">
+<div class="filter-box">
+<div class="filter-header"><span><i class="fas fa-filter"></i> Filtruj po partiach</span><button type="button" onclick="clearFilter()">Wyczyść</button></div>
+<div class="filter-body"><div class="muscle-table" id="filterMuscles">
+<div class="muscle-group"><div class="muscle-group-header push"><i class="fas fa-hand-point-up"></i> Push</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Klatka piersiowa" onchange="applyFilter()"><span class="icon"><i class="fas fa-heart"></i></span><span class="name">Klatka piersiowa</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Barki" onchange="applyFilter()"><span class="icon"><i class="fas fa-expand-arrows-alt"></i></span><span class="name">Barki</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Triceps" onchange="applyFilter()"><span class="icon"><i class="fas fa-hand-back-fist"></i></span><span class="name">Triceps</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header pull"><i class="fas fa-hand-point-down"></i> Pull</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Plecy" onchange="applyFilter()"><span class="icon"><i class="fas fa-child"></i></span><span class="name">Plecy</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Biceps" onchange="applyFilter()"><span class="icon"><i class="fas fa-hand-fist"></i></span><span class="name">Biceps</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Przedramiona" onchange="applyFilter()"><span class="icon"><i class="fas fa-hands"></i></span><span class="name">Przedramiona</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header legs"><i class="fas fa-shoe-prints"></i> Nogi</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Czworogłowy uda" onchange="applyFilter()"><span class="icon"><i class="fas fa-person-walking"></i></span><span class="name">Czworogłowy uda</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Kulszowo-goleniowe" onchange="applyFilter()"><span class="icon"><i class="fas fa-person-running"></i></span><span class="name">Kulszowo-goleniowe</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Biodra" onchange="applyFilter()"><span class="icon"><i class="fas fa-arrows-alt-h"></i></span><span class="name">Biodra</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Łydki" onchange="applyFilter()"><span class="icon"><i class="fas fa-shoe-prints"></i></span><span class="name">Łydki</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header core"><i class="fas fa-circle"></i> Korpus</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Mięśnie brzucha" onchange="applyFilter()"><span class="icon"><i class="fas fa-circle-notch"></i></span><span class="name">Mięśnie brzucha</span></label>
+</div></div>
+</div></div></div>
+<div class="filter-count" id="filterCount"></div>
+<button type="button" class="btn-create" onclick="openExerciseForm()"><i class="fas fa-plus"></i> Utwórz ćwiczenie</button>
+<div class="form-card" id="formExercise">
+<h3><i class="fas fa-plus-circle"></i> Nowe ćwiczenie</h3>
+<label class="field" for="exName">Nazwa ćwiczenia</label>
+<input type="text" id="exName" placeholder="Np. Przysiady">
+<label class="field">Partie mięśniowe</label>
+<div class="muscle-table" id="createMuscles">
+<div class="muscle-group"><div class="muscle-group-header push"><i class="fas fa-hand-point-up"></i> Push</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Klatka piersiowa"><span class="icon"><i class="fas fa-heart"></i></span><span class="name">Klatka piersiowa</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Barki"><span class="icon"><i class="fas fa-expand-arrows-alt"></i></span><span class="name">Barki</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Triceps"><span class="icon"><i class="fas fa-hand-back-fist"></i></span><span class="name">Triceps</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header pull"><i class="fas fa-hand-point-down"></i> Pull</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Plecy"><span class="icon"><i class="fas fa-child"></i></span><span class="name">Plecy</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Biceps"><span class="icon"><i class="fas fa-hand-fist"></i></span><span class="name">Biceps</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Przedramiona"><span class="icon"><i class="fas fa-hands"></i></span><span class="name">Przedramiona</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header legs"><i class="fas fa-shoe-prints"></i> Nogi</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Czworogłowy uda"><span class="icon"><i class="fas fa-person-walking"></i></span><span class="name">Czworogłowy uda</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Kulszowo-goleniowe"><span class="icon"><i class="fas fa-person-running"></i></span><span class="name">Kulszowo-goleniowe</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Biodra"><span class="icon"><i class="fas fa-arrows-alt-h"></i></span><span class="name">Biodra</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Łydki"><span class="icon"><i class="fas fa-shoe-prints"></i></span><span class="name">Łydki</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header core"><i class="fas fa-circle"></i> Korpus</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Mięśnie brzucha"><span class="icon"><i class="fas fa-circle-notch"></i></span><span class="name">Mięśnie brzucha</span></label>
+</div></div>
+</div>
+<label class="field">Zdjęcie lub wideo</label>
+<div class="media-box">
+<div class="media-btns">
+<label for="exImage"><i class="fas fa-image"></i> Zdjęcie</label>
+<input type="file" id="exImage" accept="image/*" onchange="onMediaSelect(event,'image')">
+<label for="exVideo"><i class="fas fa-video"></i> Wideo</label>
+<input type="file" id="exVideo" accept="video/*" onchange="onMediaSelect(event,'video')">
+</div>
+<div class="media-preview" id="mediaPreview"><div id="mediaContent"></div><div class="media-name" id="mediaName"></div>
+<button type="button" class="media-remove" onclick="clearMedia()"><i class="fas fa-times"></i> Usuń</button></div>
+</div>
+<label class="field" for="exDesc">Opis / wskazówki</label>
+<textarea id="exDesc" placeholder="Jak wykonać..."></textarea>
+<div class="form-actions">
+<button type="button" class="btn-cancel" onclick="closeExerciseForm()">Anuluj</button>
+<button type="button" class="btn-save" onclick="saveExercise()">Zapisz</button>
+</div>
+</div>
+<div class="section-title">Twoje ćwiczenia</div>
+<div class="list" id="listExercise"></div>
+</div>
+</div>
+<nav class="nav">
+<a href="index.html"><i class="fas fa-home"></i><span>Główna</span></a>
+<a href="eksploruj.html"><i class="fas fa-search"></i><span>Eksploruj</span></a>
+<a href="trening.html"><i class="fas fa-dumbbell"></i><span>Trening</span></a>
+<a href="biblioteka.html" class="active"><i class="fas fa-book"></i><span>Biblioteka</span></a>
+<a href="ty.html"><i class="fas fa-user"></i><span>Ty</span></a>
+</nav>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script>
+var auth=null,db=null,currentUser=null,programs=[],exercises=[],pendingMedia=null,MAX_MEDIA_MB=4;
+try{auth=firebase.auth();db=firebase.firestore()}catch(e){console.error(e)}
+function bindMI(sel){document.querySelectorAll(sel+' .muscle-item input').forEach(function(cb){cb.addEventListener('change',function(){cb.closest('.muscle-item').classList.toggle('selected',cb.checked)})})}
+bindMI('#filterMuscles');bindMI('#createMuscles');
+function openProgramForm(){document.getElementById('formProgram').classList.add('show');renderExercisePicker();document.getElementById('progName').focus()}
+function closeProgramForm(){document.getElementById('formProgram').classList.remove('show');document.getElementById('progName').value='';document.getElementById('progDesc').value='';document.querySelectorAll('input[name=progEx]').forEach(function(cb){cb.checked=false;var i=cb.closest('.ex-pick-item');if(i)i.classList.remove('selected')})}
+function openExerciseForm(){document.getElementById('formExercise').classList.add('show');document.getElementById('exName').focus()}
+function closeExerciseForm(){document.getElementById('formExercise').classList.remove('show');document.getElementById('exName').value='';document.getElementById('exDesc').value='';clearMuscleSelection();clearMedia()}
+function onMediaSelect(ev,type){var f=ev.target.files&&ev.target.files[0];if(!f)return;if(f.size>MAX_MEDIA_MB*1024*1024){toast('Plik za duży (max '+MAX_MEDIA_MB+' MB)','err');ev.target.value='';return}var r=new FileReader();r.onload=function(e){pendingMedia={type:type,dataUrl:e.target.result,name:f.name};var p=document.getElementById('mediaPreview'),c=document.getElementById('mediaContent');c.innerHTML=type==='image'?'<img src="'+e.target.result+'" alt="">':'<video src="'+e.target.result+'" controls></video>';document.getElementById('mediaName').textContent=f.name;p.classList.add('show')};r.readAsDataURL(f);if(type==='image')document.getElementById('exVideo').value='';else document.getElementById('exImage').value=''}
+function clearMedia(){pendingMedia=null;document.getElementById('mediaPreview').classList.remove('show');document.getElementById('mediaContent').innerHTML='';document.getElementById('mediaName').textContent='';document.getElementById('exImage').value='';document.getElementById('exVideo').value=''}
+function getSelectedMuscles(){return Array.prototype.map.call(document.querySelectorAll('input[name=muscle]:checked'),function(el){return el.value})}
+function clearMuscleSelection(){document.querySelectorAll('input[name=muscle]').forEach(function(cb){cb.checked=false;cb.closest('.muscle-item').classList.remove('selected')})}
+function getFilterMuscles(){return Array.prototype.map.call(document.querySelectorAll('input[name=filterMuscle]:checked'),function(el){return el.value})}
+function clearFilter(){document.querySelectorAll('input[name=filterMuscle]').forEach(function(cb){cb.checked=false;cb.closest('.muscle-item').classList.remove('selected')});applyFilter()}
+function applyFilter(){document.querySelectorAll('#filterMuscles .muscle-item input').forEach(function(cb){cb.closest('.muscle-item').classList.toggle('selected',cb.checked)});renderExercises()}
+function getFilteredExercises(){var filters=getFilterMuscles();if(!filters.length)return exercises;return exercises.filter(function(ex){var m=ex.muscles||(ex.muscle?[ex.muscle]:[]);return filters.some(function(f){return m.indexOf(f)!==-1})})}
+function getSelectedExerciseIds(){return Array.prototype.map.call(document.querySelectorAll('input[name=progEx]:checked'),function(el){return el.value})}
+function toast(t,type){var el=document.getElementById('toast');el.textContent=t;el.className='toast '+(type||'info')+' show';setTimeout(function(){el.classList.remove('show')},3000)}
+function showProgram(){document.getElementById('panelProgram').classList.add('show');document.getElementById('panelCwiczenia').classList.remove('show');document.getElementById('tabProgram').classList.add('on');document.getElementById('tabCwiczenia').classList.remove('on');renderExercisePicker()}
+function showCwiczenia(){document.getElementById('panelCwiczenia').classList.add('show');document.getElementById('panelProgram').classList.remove('show');document.getElementById('tabCwiczenia').classList.add('on');document.getElementById('tabProgram').classList.remove('on');applyFilter()}
+function storageKey(k){return 'kuznia_'+k+'_'+(currentUser?currentUser.uid:'guest')}
+function loadLocal(){try{programs=JSON.parse(localStorage.getItem(storageKey('programs'))||'[]');exercises=JSON.parse(localStorage.getItem(storageKey('exercises'))||'[]')}catch(e){programs=[];exercises=[]}renderPrograms();renderExercises();renderExercisePicker()}
+function saveLocal(){try{localStorage.setItem(storageKey('programs'),JSON.stringify(programs));localStorage.setItem(storageKey('exercises'),JSON.stringify(exercises))}catch(e){toast('Za mało miejsca (duże pliki)','err')}}
+async function syncToCloud(){if(!currentUser||!db)return;try{var light=exercises.map(function(ex){var c=Object.assign({},ex);if(c.media&&c.media.dataUrl&&c.media.dataUrl.length>500000)c.media={type:c.media.type,name:c.media.name,localOnly:true};return c});await db.collection('users').doc(currentUser.uid).set({programs:programs,exercises:light,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.error(e)}}
+async function loadFromCloud(){if(!currentUser||!db)return;try{var doc=await db.collection('users').doc(currentUser.uid).get();if(doc.exists){var data=doc.data();if(data.programs)programs=data.programs;if(data.exercises){var lm={};exercises.forEach(function(e){lm[e.id]=e});exercises=data.exercises.map(function(ex){if(ex.media&&ex.media.localOnly&&lm[ex.id]&&lm[ex.id].media)ex.media=lm[ex.id].media;return ex})}saveLocal();renderPrograms();renderExercises();renderExercisePicker()}}catch(e){console.error(e)}}
+function renderExercisePicker(){var el=document.getElementById('exPickList');if(!exercises.length){el.innerHTML='<div class="ex-pick-empty">Najpierw dodaj ćwiczenia w zakładce Ćwiczenia</div>';return}el.innerHTML=exercises.map(function(ex){var meta=(ex.muscles||[]).join(', ')||(ex.muscle||'');return '<label class="ex-pick-item"><input type="checkbox" name="progEx" value="'+ex.id+'"><div><div class="ex-pick-name">'+escapeHtml(ex.name)+'</div><div class="ex-pick-meta">'+escapeHtml(meta)+'</div></div></label>'}).join('');el.querySelectorAll('.ex-pick-item input').forEach(function(cb){cb.addEventListener('change',function(){cb.closest('.ex-pick-item').classList.toggle('selected',cb.checked)})})}
+function saveProgram(){var name=document.getElementById('progName').value.trim(),desc=document.getElementById('progDesc').value.trim(),ids=getSelectedExerciseIds();if(!name){toast('Podaj nazwę programu','err');return}if(!ids.length){toast('Wybierz przynajmniej jedno ćwiczenie','err');return}var sel=ids.map(function(id){var f=exercises.find(function(e){return e.id===id});return f?{id:f.id,name:f.name,muscles:f.muscles||[]}:null}).filter(Boolean);programs.unshift({id:Date.now().toString(),name:name,description:desc,exercises:sel,createdAt:new Date().toISOString()});saveLocal();syncToCloud();renderPrograms();closeProgramForm();toast('Program zapisany!','ok')}
+function saveExercise(){var name=document.getElementById('exName').value.trim(),muscles=getSelectedMuscles(),desc=document.getElementById('exDesc').value.trim();if(!name){toast('Podaj nazwę ćwiczenia','err');return}if(!muscles.length){toast('Wybierz partię mięśniową','err');return}var item={id:Date.now().toString(),name:name,muscles:muscles,muscle:muscles.join(', '),description:desc,createdAt:new Date().toISOString()};if(pendingMedia)item.media={type:pendingMedia.type,dataUrl:pendingMedia.dataUrl,name:pendingMedia.name};exercises.unshift(item);saveLocal();syncToCloud();renderExercises();renderExercisePicker();closeExerciseForm();toast('Ćwiczenie zapisane!','ok')}
+function deleteProgram(id){if(!confirm('Usunąć ten program?'))return;programs=programs.filter(function(p){return p.id!==id});saveLocal();syncToCloud();renderPrograms();toast('Program usunięty','info')}
+function deleteExercise(id){if(!confirm('Usunąć to ćwiczenie?'))return;exercises=exercises.filter(function(e){return e.id!==id});programs=programs.map(function(p){if(p.exercises)p.exercises=p.exercises.filter(function(ex){return ex.id!==id});return p});saveLocal();syncToCloud();renderExercises();renderPrograms();renderExercisePicker();toast('Ćwiczenie usunięte','info')}
+function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function formatDate(iso){if(!iso)return'';try{return new Date(iso).toLocaleDateString('pl-PL')}catch(e){return''}}
+function renderPrograms(){var el=document.getElementById('listProgram');if(!programs.length){el.innerHTML='<div class="empty">Brak zapisanych programów</div>';return}el.innerHTML=programs.map(function(p){var exList='';if(p.exercises&&p.exercises.length)exList='<ul class="card-ex-list">'+p.exercises.map(function(ex){return '<li>'+escapeHtml(ex.name)+'</li>'}).join('')+'</ul>';return '<div class="card"><div class="card-title">'+escapeHtml(p.name)+'</div><div class="card-meta">'+(p.exercises?p.exercises.length:0)+' ćw. · '+formatDate(p.createdAt)+'</div>'+(p.description?'<div class="card-desc">'+escapeHtml(p.description)+'</div>':'')+exList+'<div class="card-actions"><button type="button" onclick="deleteProgram(\''+p.id+'\')"><i class="fas fa-trash"></i> Usuń</button></div></div>'}).join('')}
+function renderExercises(){var el=document.getElementById('listExercise'),filtered=getFilteredExercises(),filters=getFilterMuscles(),countEl=document.getElementById('filterCount');countEl.textContent=filters.length?('Pokazano '+filtered.length+' z '+exercises.length+' ćwiczeń'):(exercises.length?('Wszystkie ćwiczenia: '+exercises.length):'');if(!filtered.length){el.innerHTML='<div class="empty">'+(exercises.length?'Brak ćwiczeń dla wybranych partii.<br>Zmień filtr lub wyczyść go.':'Brak ćwiczeń.<br>Kliknij „Utwórz ćwiczenie”.')+'</div>';return}el.innerHTML=filtered.map(function(e){var muscleText=e.muscles?e.muscles.join(', '):(e.muscle||''),mediaHtml='';if(e.media&&e.media.dataUrl){if(e.media.type==='image')mediaHtml='<div class="card-media"><img src="'+e.media.dataUrl+'" alt=""></div>';else if(e.media.type==='video')mediaHtml='<div class="card-media"><video src="'+e.media.dataUrl+'" controls></video></div>'}return '<div class="card"><div class="card-title">'+escapeHtml(e.name)+'</div><div class="card-meta">'+escapeHtml(muscleText)+' · '+formatDate(e.createdAt)+'</div>'+mediaHtml+(e.description?'<div class="card-desc">'+escapeHtml(e.description)+'</div>':'')+'<div class="card-actions"><button type="button" onclick="deleteExercise(\''+e.id+'\')"><i class="fas fa-trash"></i> Usuń</button></div></div>'}).join('')}
+if(auth){auth.onAuthStateChanged(function(user){currentUser=user;var status=document.getElementById('status');if(user){status.innerHTML='<i class="fas fa-user-check"></i> '+(user.displayName||user.email);status.classList.add('on');loadFromCloud().then(function(){if(!programs.length&&!exercises.length)loadLocal()})}else{status.innerHTML='<i class="fas fa-user"></i> Gość';status.classList.remove('on');loadLocal()}})}else{loadLocal()}
+</script>
+</body>
+</html>
