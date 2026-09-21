@@ -9,16 +9,20 @@
 // 6. W Firestore Database utwórz bazę (tryb testowy na start)
 // ============================================
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "WSTAW_SWOJ_API_KEY",
-  authDomain: "WSTAW_SWOJ_PROJECT_ID.firebaseapp.com",
-  projectId: "WSTAW_SWOJ_PROJECT_ID",
-  storageBucket: "WSTAW_SWOJ_PROJECT_ID.appspot.com",
-  messagingSenderId: "WSTAW_SENDER_ID",
-  appId: "WSTAW_SWOJ_APP_ID"
+  apiKey: "AIzaSyBM0s2mABAPNDAQBrjS0KNdpghqiQnylbw",
+  authDomain: "kuznia-ciala-136bb.firebaseapp.com",
+  projectId: "kuznia-ciala-136bb",
+  storageBucket: "kuznia-ciala-136bb.firebasestorage.app",
+  messagingSenderId: "188779890694",
+  appId: "1:188779890694:web:687b6348db8fbb56cd9b87"
 };
 
-// Inicjalizacja (nie ruszaj poniżej)
-if (typeof firebase !== 'undefined') {
-  firebase.initializeApp(firebaseConfig);
-}
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
