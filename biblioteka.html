@@ -42,7 +42,7 @@ textarea{min-height:70px;resize:vertical}
 .filter-box.collapsed .chev{transform:rotate(-90deg)}
 .muscle-table{display:flex;flex-direction:column;gap:10px}
 .muscle-group{border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;background:rgba(0,0,0,.15)}
-.muscle-group-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.muscle-group-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-transform:uppercase}
 .muscle-group-header.push{background:rgba(255,107,107,.2);color:#ff6b6b}
 .muscle-group-header.pull{background:rgba(72,219,251,.2);color:#48dbfb}
 .muscle-group-header.legs{background:rgba(254,202,87,.2);color:#feca57}
@@ -107,10 +107,13 @@ textarea{min-height:70px;resize:vertical}
 .draft-order button:disabled{opacity:.3;cursor:default}
 .draft-remove{border-color:rgba(225,112,85,.5)!important;color:#e17055!important}
 .draft-meta{font-size:.75rem;color:#888;margin:6px 0 8px 22px}
-.draft-sets{display:flex;gap:10px;margin-left:22px;flex-wrap:wrap}
-.draft-sets label{font-size:.75rem;color:#aaa;display:flex;flex-direction:column;gap:4px}
-.draft-sets input{width:90px;padding:8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:8px;background:rgba(255,255,255,.06);color:#fff;font-size:.9rem}
-.draft-sets input[type=text]{width:110px}
+.set-row-wrap{display:flex;align-items:flex-end;gap:8px;margin-left:0;flex-wrap:wrap;margin-top:8px}
+.set-cols{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.set-col{display:flex;flex-direction:column;align-items:center;min-width:64px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px}
+.set-col-head{font-size:.7rem;color:#feca57;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.set-col-x{border:none;background:transparent;color:#e17055;cursor:pointer;font-size:1rem;line-height:1;padding:0 2px}
+.set-col-input{width:58px;padding:6px 4px;border:1px solid rgba(255,255,255,.15);border-radius:6px;background:rgba(255,255,255,.06);color:#fff;font-size:.8rem;text-align:center}
+.btn-add-set{padding:8px 10px;border-radius:10px;border:1px dashed rgba(72,219,251,.5);background:rgba(72,219,251,.08);color:#48dbfb;font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -254,8 +257,8 @@ textarea{min-height:70px;resize:vertical}
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js?v=6"></script>
-<script src="js/firestore-helper.js?v=6"></script>
-<script src="js/biblioteka-app.js?v=6"></script>
+<script src="js/firebase-config.js?v=8"></script>
+<script src="js/firestore-helper.js?v=8"></script>
+<script src="js/biblioteka-app.js?v=8"></script>
 </body>
 </html>
