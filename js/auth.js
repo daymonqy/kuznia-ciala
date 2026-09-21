@@ -27,7 +27,8 @@ function updateUIForAuth(user) {
   if (user) {
     // Zalogowany
     if (authStatus) {
-      authStatus.innerHTML = `<i class="fas fa-user-check"></i> ${user.email}`;
+      const label = user.displayName || user.email;
+      authStatus.innerHTML = `<i class="fas fa-user-check"></i> ${label}`;
       authStatus.classList.add('logged-in');
     }
     if (loginForm) loginForm.style.display = 'none';
@@ -37,6 +38,8 @@ function updateUIForAuth(user) {
       userPanel.style.display = 'block';
       const emailEl = document.getElementById('user-email');
       if (emailEl) emailEl.textContent = user.email;
+      const nameEl = document.getElementById('user-name');
+      if (nameEl && user.displayName) nameEl.textContent = user.displayName;
     }
   } else {
     // Niezalogowany
@@ -84,21 +87,27 @@ async function login(email, password) {
   }
 }
 
-// --- REJESTRACJA ---
-async function register(email, password) {
+// --- REJESTRACJA (imię + e-mail + hasło) ---
+async function register(name, email, password) {
   try {
     showMessage('Tworzenie konta...', 'info');
     const cred = await auth.createUserWithEmailAndPassword(email, password);
+
+    // Ustawiamy imię w profilu Firebase Auth
+    await cred.user.updateProfile({ displayName: name });
+
     // Tworzymy profil użytkownika w Firestore
     await db.collection('users').doc(cred.user.uid).set({
+      name: name,
+      displayName: name,
       email: email,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      displayName: email.split('@')[0],
       workouts: [],
       favorites: [],
       progress: {}
     });
-    showMessage('Konto utworzone! Witaj w Kuźni Ciała!', 'success');
+
+    showMessage('Konto utworzone! Witaj, ' + name + '!', 'success');
   } catch (error) {
     showMessage(getErrorMessage(error), 'error');
   }
@@ -233,9 +242,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (registerFormEl) {
     registerFormEl.addEventListener('submit', (e) => {
       e.preventDefault();
+      const name = document.getElementById('register-name').value.trim();
       const email = document.getElementById('register-email').value.trim();
       const password = document.getElementById('register-password').value;
       const password2 = document.getElementById('register-password2').value;
+
+      if (!name || name.length < 2) {
+        showMessage('Podaj imię (min. 2 znaki)', 'error');
+        return;
+      }
       if (password !== password2) {
         showMessage('Hasła nie są takie same', 'error');
         return;
@@ -244,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showMessage('Hasło musi mieć min. 6 znaków', 'error');
         return;
       }
-      register(email, password);
+      register(name, email, password);
     });
   }
 
