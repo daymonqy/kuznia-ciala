@@ -28,11 +28,21 @@
     .panel { display: none; }
     .panel.show { display: block; }
 
+    .btn-create {
+      width: 100%; padding: 14px; margin-bottom: 16px;
+      border: 1px dashed rgba(254, 202, 87, 0.5); border-radius: 12px;
+      background: rgba(254, 202, 87, 0.08); color: #feca57;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-create:hover { background: rgba(254, 202, 87, 0.15); }
+
     .form-card {
+      display: none;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 14px; padding: 16px; margin-bottom: 24px;
     }
+    .form-card.show { display: block; }
     .form-card h3 { font-size: 1.05rem; margin-bottom: 14px; color: #feca57; }
     label.field { display: block; font-size: 0.8rem; color: #aaa; margin-bottom: 6px; }
     input[type="text"], input[type="number"], textarea {
@@ -43,67 +53,83 @@
     }
     input:focus, textarea:focus { border-color: #feca57; }
     textarea { min-height: 80px; resize: vertical; }
+    .form-actions { display: flex; gap: 10px; margin-top: 4px; }
     .btn-save {
-      width: 100%; padding: 14px; border: none; border-radius: 10px;
+      flex: 1; padding: 14px; border: none; border-radius: 10px;
       background: linear-gradient(135deg, #feca57, #ff9f43);
       color: #0f0f0f; font-weight: 700; font-size: 1rem; cursor: pointer;
     }
+    .btn-cancel {
+      flex: 1; padding: 14px; border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px; background: transparent; color: #aaa;
+      font-weight: 600; cursor: pointer;
+    }
 
-    /* Media upload */
     .media-box {
-      border: 1px dashed rgba(254,202,87,0.4);
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-      margin-bottom: 12px;
+      border: 1px dashed rgba(254,202,87,0.4); border-radius: 12px;
+      padding: 16px; text-align: center; margin-bottom: 12px;
       background: rgba(254,202,87,0.05);
     }
     .media-box input[type="file"] { display: none; }
     .media-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-    .media-btns label, .media-btns button {
+    .media-btns label {
       padding: 10px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
       background: rgba(255,255,255,0.06); color: #eee; font-size: 0.85rem;
       cursor: pointer; font-weight: 600;
     }
-    .media-btns label:hover, .media-btns button:hover {
-      border-color: #feca57; color: #feca57;
-    }
-    .media-preview {
-      margin-top: 12px;
-      display: none;
-    }
+    .media-preview { margin-top: 12px; display: none; }
     .media-preview.show { display: block; }
     .media-preview img, .media-preview video {
-      max-width: 100%; max-height: 200px; border-radius: 10px;
-      object-fit: contain; background: #000;
+      max-width: 100%; max-height: 200px; border-radius: 10px; object-fit: contain; background: #000;
     }
-    .media-preview .media-name {
-      font-size: 0.75rem; color: #888; margin-top: 6px;
-    }
+    .media-preview .media-name { font-size: 0.75rem; color: #888; margin-top: 6px; }
     .media-preview .media-remove {
       margin-top: 8px; padding: 6px 12px; border-radius: 8px;
       border: 1px solid rgba(225,112,85,0.5); background: transparent;
       color: #e17055; font-size: 0.8rem; cursor: pointer;
     }
 
-    /* Muscle table */
-    .muscle-table { display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px; }
+    /* Filtr partii */
+    .filter-box {
+      margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.2);
+    }
+    .filter-header {
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #feca57;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(254,202,87,0.08);
+    }
+    .filter-header button {
+      background: none; border: none; color: #888; font-size: 0.75rem;
+      cursor: pointer; text-decoration: underline;
+    }
+    .filter-body { padding: 10px; }
+
+    .muscle-table { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
     .muscle-group {
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-      overflow: hidden; background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+      overflow: hidden; background: rgba(0,0,0,0.15);
     }
     .muscle-group-header {
-      padding: 10px 14px; font-size: 0.8rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      display: flex; align-items: center; gap: 6px;
     }
     .muscle-group-header.push { background: rgba(255,107,107,0.2); color: #ff6b6b; }
     .muscle-group-header.pull { background: rgba(72,219,251,0.2); color: #48dbfb; }
     .muscle-group-header.legs { background: rgba(254,202,87,0.2); color: #feca57; }
     .muscle-group-header.core { background: rgba(162,155,254,0.2); color: #a29bfe; }
-    .muscle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .muscle-grid { display: grid; grid-template-columns: 1fr 1fr; }
     .muscle-item {
-      display: flex; align-items: center; gap: 10px; padding: 12px;
+      display: flex; align-items: center; gap: 8px; padding: 10px;
       border-top: 1px solid rgba(255,255,255,0.06);
       border-right: 1px solid rgba(255,255,255,0.06);
       cursor: pointer; user-select: none;
@@ -112,13 +138,16 @@
     .muscle-item:hover { background: rgba(255,255,255,0.04); }
     .muscle-item.selected { background: rgba(254,202,87,0.12); }
     .muscle-item input {
-      width: 16px; height: 16px; margin: 0; accent-color: #feca57; flex-shrink: 0; cursor: pointer;
+      width: 15px; height: 15px; margin: 0; accent-color: #feca57; flex-shrink: 0; cursor: pointer;
     }
-    .muscle-item .icon { width: 22px; text-align: center; font-size: 0.95rem; color: #feca57; flex-shrink: 0; }
-    .muscle-item .name { font-size: 0.82rem; font-weight: 500; color: #ddd; line-height: 1.25; }
+    .muscle-item .icon { width: 20px; text-align: center; font-size: 0.9rem; color: #feca57; flex-shrink: 0; }
+    .muscle-item .name { font-size: 0.78rem; font-weight: 500; color: #ddd; line-height: 1.2; }
     .muscle-item.selected .name { color: #feca57; }
 
-    /* Wybór ćwiczeń do programu */
+    .filter-count {
+      font-size: 0.8rem; color: #888; margin-bottom: 12px; text-align: center;
+    }
+
     .ex-pick-list {
       display: flex; flex-direction: column; gap: 8px;
       margin-bottom: 14px; max-height: 280px; overflow-y: auto;
@@ -156,15 +185,9 @@
     .card-media img, .card-media video {
       max-width: 100%; max-height: 180px; border-radius: 10px; background: #000;
     }
-    .card-ex-list {
-      margin-top: 8px; padding-left: 4px;
-    }
-    .card-ex-list li {
-      font-size: 0.85rem; color: #ccc; margin-bottom: 4px; list-style: none;
-    }
-    .card-ex-list li::before {
-      content: "• "; color: #feca57;
-    }
+    .card-ex-list { margin-top: 8px; padding-left: 4px; }
+    .card-ex-list li { font-size: 0.85rem; color: #ccc; margin-bottom: 4px; list-style: none; }
+    .card-ex-list li::before { content: "• "; color: #feca57; }
     .card-actions { margin-top: 10px; }
     .card-actions button {
       padding: 6px 12px; border-radius: 8px;
@@ -221,8 +244,12 @@
 
     <!-- ========== PROGRAM ========== -->
     <div class="panel show" id="panelProgram">
-      <div class="form-card">
-        <h3><i class="fas fa-plus-circle"></i> Utwórz program</h3>
+      <button type="button" class="btn-create" onclick="openProgramForm()">
+        <i class="fas fa-plus"></i> Utwórz program
+      </button>
+
+      <div class="form-card" id="formProgram">
+        <h3><i class="fas fa-plus-circle"></i> Nowy program</h3>
 
         <label class="field" for="progName">Nazwa programu</label>
         <input type="text" id="progName" placeholder="Np. Siła pełnego ciała">
@@ -235,7 +262,10 @@
           <div class="ex-pick-empty">Najpierw dodaj ćwiczenia w zakładce Ćwiczenia</div>
         </div>
 
-        <button type="button" class="btn-save" onclick="saveProgram()">Zapisz program</button>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="closeProgramForm()">Anuluj</button>
+          <button type="button" class="btn-save" onclick="saveProgram()">Zapisz</button>
+        </div>
       </div>
 
       <div class="section-title">Twoje programy</div>
@@ -244,14 +274,65 @@
 
     <!-- ========== ĆWICZENIA ========== -->
     <div class="panel" id="panelCwiczenia">
-      <div class="form-card">
-        <h3><i class="fas fa-plus-circle"></i> Utwórz ćwiczenie</h3>
+
+      <!-- FILTR PARTII -->
+      <div class="filter-box">
+        <div class="filter-header">
+          <span><i class="fas fa-filter"></i> Filtruj po partiach</span>
+          <button type="button" onclick="clearFilter()">Wyczyść</button>
+        </div>
+        <div class="filter-body">
+          <div class="muscle-table" id="filterMuscles">
+            <div class="muscle-group">
+              <div class="muscle-group-header push"><i class="fas fa-hand-point-up"></i> Push</div>
+              <div class="muscle-grid">
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Klatka piersiowa" onchange="applyFilter()"><span class="icon"><i class="fas fa-heart"></i></span><span class="name">Klatka piersiowa</span></label>
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Barki" onchange="applyFilter()"><span class="icon"><i class="fas fa-expand-arrows-alt"></i></span><span class="name">Barki</span></label>
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Triceps" onchange="applyFilter()"><span class="icon"><i class="fas fa-hand-back-fist"></i></span><span class="name">Triceps</span></label>
+              </div>
+            </div>
+            <div class="muscle-group">
+              <div class="muscle-group-header pull"><i class="fas fa-hand-point-down"></i> Pull</div>
+              <div class="muscle-grid">
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Plecy" onchange="applyFilter()"><span class="icon"><i class="fas fa-child"></i></span><span class="name">Plecy</span></label>
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Biceps" onchange="applyFilter()"><span class="icon"><i class="fas fa-hand-fist"></i></span><span class="name">Biceps</span></label>
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Przedramiona" onchange="applyFilter()"><span class="icon"><i class="fas fa-hands"></i></span><span class="name">Przedramiona</span></label>
+              </div>
+            </div>
+            <div class="muscle-group">
+              <div class="muscle-group-header legs"><i class="fas fa-shoe-prints"></i> Nogi</div>
+              <div class="muscle-grid">
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Czworogłowy uda" onchange="applyFilter()"><span class="icon"><i class="fas fa-person-walking"></i></span><span class="name">Czworogłowy uda</span></label>
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Kulszowo-goleniowe" onchange="applyFilter()"><span class="icon"><i class="fas fa-person-running"></i></span><span class="name">Kulszowo-goleniowe</span></label>
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Biodra" onchange="applyFilter()"><span class="icon"><i class="fas fa-arrows-alt-h"></i></span><span class="name">Biodra</span></label>
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Łydki" onchange="applyFilter()"><span class="icon"><i class="fas fa-shoe-prints"></i></span><span class="name">Łydki</span></label>
+              </div>
+            </div>
+            <div class="muscle-group">
+              <div class="muscle-group-header core"><i class="fas fa-circle"></i> Korpus</div>
+              <div class="muscle-grid">
+                <label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Mięśnie brzucha" onchange="applyFilter()"><span class="icon"><i class="fas fa-circle-notch"></i></span><span class="name">Mięśnie brzucha</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-count" id="filterCount"></div>
+
+      <button type="button" class="btn-create" onclick="openExerciseForm()">
+        <i class="fas fa-plus"></i> Utwórz ćwiczenie
+      </button>
+
+      <!-- FORMULARZ TWORZENIA (ukryty domyślnie) -->
+      <div class="form-card" id="formExercise">
+        <h3><i class="fas fa-plus-circle"></i> Nowe ćwiczenie</h3>
 
         <label class="field" for="exName">Nazwa ćwiczenia</label>
         <input type="text" id="exName" placeholder="Np. Przysiady">
 
         <label class="field">Partie mięśniowe (możesz wybrać kilka)</label>
-        <div class="muscle-table">
+        <div class="muscle-table" id="createMuscles">
           <div class="muscle-group">
             <div class="muscle-group-header push"><i class="fas fa-hand-point-up"></i> Push</div>
             <div class="muscle-grid">
@@ -303,7 +384,10 @@
         <label class="field" for="exDesc">Opis / wskazówki</label>
         <textarea id="exDesc" placeholder="Jak wykonać, tempo, uwagi..."></textarea>
 
-        <button type="button" class="btn-save" onclick="saveExercise()">Zapisz ćwiczenie</button>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="closeExerciseForm()">Anuluj</button>
+          <button type="button" class="btn-save" onclick="saveExercise()">Zapisz</button>
+        </div>
       </div>
 
       <div class="section-title">Twoje ćwiczenia</div>
@@ -327,55 +411,72 @@
     var auth = null, db = null, currentUser = null;
     var programs = [];
     var exercises = [];
-    var pendingMedia = null; // { type: 'image'|'video', dataUrl: string, name: string }
-
-    var MAX_MEDIA_MB = 4; // limit localStorage / rozsądny rozmiar
+    var pendingMedia = null;
+    var MAX_MEDIA_MB = 4;
 
     try {
       auth = firebase.auth();
       db = firebase.firestore();
     } catch (e) { console.error(e); }
 
-    document.querySelectorAll('.muscle-item input').forEach(function(cb) {
-      cb.addEventListener('change', function() {
-        cb.closest('.muscle-item').classList.toggle('selected', cb.checked);
+    // Podświetlanie checkboxów (filtr + tworzenie)
+    function bindMuscleItems(selector) {
+      document.querySelectorAll(selector + ' .muscle-item input').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+          cb.closest('.muscle-item').classList.toggle('selected', cb.checked);
+        });
       });
-    });
+    }
+    bindMuscleItems('#filterMuscles');
+    bindMuscleItems('#createMuscles');
+
+    function openProgramForm() {
+      document.getElementById('formProgram').classList.add('show');
+      renderExercisePicker();
+      document.getElementById('progName').focus();
+    }
+    function closeProgramForm() {
+      document.getElementById('formProgram').classList.remove('show');
+      document.getElementById('progName').value = '';
+      document.getElementById('progDesc').value = '';
+      document.querySelectorAll('input[name="progEx"]').forEach(function(cb) {
+        cb.checked = false;
+        var item = cb.closest('.ex-pick-item');
+        if (item) item.classList.remove('selected');
+      });
+    }
+
+    function openExerciseForm() {
+      document.getElementById('formExercise').classList.add('show');
+      document.getElementById('exName').focus();
+    }
+    function closeExerciseForm() {
+      document.getElementById('formExercise').classList.remove('show');
+      document.getElementById('exName').value = '';
+      document.getElementById('exDesc').value = '';
+      clearMuscleSelection();
+      clearMedia();
+    }
 
     function onMediaSelect(event, type) {
       var file = event.target.files && event.target.files[0];
       if (!file) return;
-
       if (file.size > MAX_MEDIA_MB * 1024 * 1024) {
         toast('Plik za duży (max ' + MAX_MEDIA_MB + ' MB)', 'err');
         event.target.value = '';
         return;
       }
-
       var reader = new FileReader();
       reader.onload = function(e) {
-        pendingMedia = {
-          type: type,
-          dataUrl: e.target.result,
-          name: file.name
-        };
+        pendingMedia = { type: type, dataUrl: e.target.result, name: file.name };
         var preview = document.getElementById('mediaPreview');
         var content = document.getElementById('mediaContent');
-        var nameEl = document.getElementById('mediaName');
-        if (type === 'image') {
-          content.innerHTML = '<img src="' + e.target.result + '" alt="Podgląd">';
-        } else {
-          content.innerHTML = '<video src="' + e.target.result + '" controls></video>';
-        }
-        nameEl.textContent = file.name;
+        if (type === 'image') content.innerHTML = '<img src="' + e.target.result + '" alt="">';
+        else content.innerHTML = '<video src="' + e.target.result + '" controls></video>';
+        document.getElementById('mediaName').textContent = file.name;
         preview.classList.add('show');
       };
-      reader.onerror = function() {
-        toast('Nie udało się wczytać pliku', 'err');
-      };
       reader.readAsDataURL(file);
-
-      // wyczyść drugi input
       if (type === 'image') document.getElementById('exVideo').value = '';
       else document.getElementById('exImage').value = '';
     }
@@ -390,8 +491,10 @@
     }
 
     function getSelectedMuscles() {
-      var checked = document.querySelectorAll('input[name="muscle"]:checked');
-      return Array.prototype.map.call(checked, function(el) { return el.value; });
+      return Array.prototype.map.call(
+        document.querySelectorAll('input[name="muscle"]:checked'),
+        function(el) { return el.value; }
+      );
     }
 
     function clearMuscleSelection() {
@@ -401,9 +504,44 @@
       });
     }
 
+    function getFilterMuscles() {
+      return Array.prototype.map.call(
+        document.querySelectorAll('input[name="filterMuscle"]:checked'),
+        function(el) { return el.value; }
+      );
+    }
+
+    function clearFilter() {
+      document.querySelectorAll('input[name="filterMuscle"]').forEach(function(cb) {
+        cb.checked = false;
+        cb.closest('.muscle-item').classList.remove('selected');
+      });
+      applyFilter();
+    }
+
+    function applyFilter() {
+      // podświetlenie
+      document.querySelectorAll('#filterMuscles .muscle-item input').forEach(function(cb) {
+        cb.closest('.muscle-item').classList.toggle('selected', cb.checked);
+      });
+      renderExercises();
+    }
+
+    function getFilteredExercises() {
+      var filters = getFilterMuscles();
+      if (!filters.length) return exercises;
+      // pokaż ćwiczenia, które mają PRZYNAJMNIEJ JEDNĄ z wybranych partii
+      return exercises.filter(function(ex) {
+        var muscles = ex.muscles || (ex.muscle ? [ex.muscle] : []);
+        return filters.some(function(f) { return muscles.indexOf(f) !== -1; });
+      });
+    }
+
     function getSelectedExerciseIds() {
-      var checked = document.querySelectorAll('input[name="progEx"]:checked');
-      return Array.prototype.map.call(checked, function(el) { return el.value; });
+      return Array.prototype.map.call(
+        document.querySelectorAll('input[name="progEx"]:checked'),
+        function(el) { return el.value; }
+      );
     }
 
     function toast(text, type) {
@@ -426,6 +564,7 @@
       document.getElementById('panelProgram').classList.remove('show');
       document.getElementById('tabCwiczenia').classList.add('on');
       document.getElementById('tabProgram').classList.remove('on');
+      applyFilter();
     }
 
     function storageKey(kind) {
@@ -438,8 +577,7 @@
         programs = JSON.parse(localStorage.getItem(storageKey('programs')) || '[]');
         exercises = JSON.parse(localStorage.getItem(storageKey('exercises')) || '[]');
       } catch (e) {
-        programs = [];
-        exercises = [];
+        programs = []; exercises = [];
       }
       renderPrograms();
       renderExercises();
@@ -451,15 +589,13 @@
         localStorage.setItem(storageKey('programs'), JSON.stringify(programs));
         localStorage.setItem(storageKey('exercises'), JSON.stringify(exercises));
       } catch (e) {
-        toast('Za mało miejsca w przeglądarce (duże pliki). Usuń stare ćwiczenia z media.', 'err');
-        console.error(e);
+        toast('Za mało miejsca (duże pliki). Usuń stare ćwiczenia z media.', 'err');
       }
     }
 
     async function syncToCloud() {
       if (!currentUser || !db) return;
       try {
-        // bez dużych dataUrl do Firestore (limit dokumentu)
         var lightExercises = exercises.map(function(ex) {
           var copy = Object.assign({}, ex);
           if (copy.media && copy.media.dataUrl && copy.media.dataUrl.length > 500000) {
@@ -472,9 +608,7 @@
           exercises: lightExercises,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-      } catch (e) {
-        console.error('Cloud sync:', e);
-      }
+      } catch (e) { console.error(e); }
     }
 
     async function loadFromCloud() {
@@ -484,7 +618,6 @@
         if (doc.exists) {
           var data = doc.data();
           if (data.programs) programs = data.programs;
-          // zachowaj lokalne media jeśli cloud ma localOnly
           if (data.exercises) {
             var localMap = {};
             exercises.forEach(function(e) { localMap[e.id] = e; });
@@ -516,7 +649,6 @@
           '<div><div class="ex-pick-name">' + escapeHtml(ex.name) + '</div>' +
           '<div class="ex-pick-meta">' + escapeHtml(meta) + '</div></div></label>';
       }).join('');
-
       el.querySelectorAll('.ex-pick-item input').forEach(function(cb) {
         cb.addEventListener('change', function() {
           cb.closest('.ex-pick-item').classList.toggle('selected', cb.checked);
@@ -529,14 +661,8 @@
       var desc = document.getElementById('progDesc').value.trim();
       var selectedIds = getSelectedExerciseIds();
 
-      if (!name) {
-        toast('Podaj nazwę programu', 'err');
-        return;
-      }
-      if (!selectedIds.length) {
-        toast('Wybierz przynajmniej jedno ćwiczenie', 'err');
-        return;
-      }
+      if (!name) { toast('Podaj nazwę programu', 'err'); return; }
+      if (!selectedIds.length) { toast('Wybierz przynajmniej jedno ćwiczenie', 'err'); return; }
 
       var selectedExercises = selectedIds.map(function(id) {
         var found = exercises.find(function(e) { return e.id === id; });
@@ -554,13 +680,7 @@
       saveLocal();
       syncToCloud();
       renderPrograms();
-
-      document.getElementById('progName').value = '';
-      document.getElementById('progDesc').value = '';
-      document.querySelectorAll('input[name="progEx"]').forEach(function(cb) {
-        cb.checked = false;
-        cb.closest('.ex-pick-item').classList.remove('selected');
-      });
+      closeProgramForm();
       toast('Program zapisany!', 'ok');
     }
 
@@ -569,14 +689,8 @@
       var muscles = getSelectedMuscles();
       var desc = document.getElementById('exDesc').value.trim();
 
-      if (!name) {
-        toast('Podaj nazwę ćwiczenia', 'err');
-        return;
-      }
-      if (!muscles.length) {
-        toast('Wybierz przynajmniej jedną partię mięśniową', 'err');
-        return;
-      }
+      if (!name) { toast('Podaj nazwę ćwiczenia', 'err'); return; }
+      if (!muscles.length) { toast('Wybierz przynajmniej jedną partię mięśniową', 'err'); return; }
 
       var item = {
         id: Date.now().toString(),
@@ -586,13 +700,8 @@
         description: desc,
         createdAt: new Date().toISOString()
       };
-
       if (pendingMedia) {
-        item.media = {
-          type: pendingMedia.type,
-          dataUrl: pendingMedia.dataUrl,
-          name: pendingMedia.name
-        };
+        item.media = { type: pendingMedia.type, dataUrl: pendingMedia.dataUrl, name: pendingMedia.name };
       }
 
       exercises.unshift(item);
@@ -600,11 +709,7 @@
       syncToCloud();
       renderExercises();
       renderExercisePicker();
-
-      document.getElementById('exName').value = '';
-      document.getElementById('exDesc').value = '';
-      clearMuscleSelection();
-      clearMedia();
+      closeExerciseForm();
       toast('Ćwiczenie zapisane!', 'ok');
     }
 
@@ -620,11 +725,8 @@
     function deleteExercise(id) {
       if (!confirm('Usunąć to ćwiczenie?')) return;
       exercises = exercises.filter(function(e) { return e.id !== id; });
-      // usuń też z programów odniesienia
       programs = programs.map(function(p) {
-        if (p.exercises) {
-          p.exercises = p.exercises.filter(function(ex) { return ex.id !== id; });
-        }
+        if (p.exercises) p.exercises = p.exercises.filter(function(ex) { return ex.id !== id; });
         return p;
       });
       saveLocal();
@@ -673,11 +775,26 @@
 
     function renderExercises() {
       var el = document.getElementById('listExercise');
-      if (!exercises.length) {
-        el.innerHTML = '<div class="empty">Brak zapisanych ćwiczeń</div>';
+      var filtered = getFilteredExercises();
+      var filters = getFilterMuscles();
+
+      var countEl = document.getElementById('filterCount');
+      if (filters.length) {
+        countEl.textContent = 'Pokazano ' + filtered.length + ' z ' + exercises.length + ' ćwiczeń';
+      } else {
+        countEl.textContent = exercises.length ? ('Wszystkie ćwiczenia: ' + exercises.length) : '';
+      }
+
+      if (!filtered.length) {
+        el.innerHTML = '<div class="empty">' +
+          (exercises.length
+            ? 'Brak ćwiczeń dla wybranych partii'<br>Zmień filtr lub wyczyść go.'
+            : 'Brak ćwiczeń.<br>Kliknij „Utwórz ćwiczenie”.') +
+          '</div>';
         return;
       }
-      el.innerHTML = exercises.map(function(e) {
+
+      el.innerHTML = filtered.map(function(e) {
         var muscleText = e.muscles ? e.muscles.join(', ') : (e.muscle || '');
         var mediaHtml = '';
         if (e.media && e.media.dataUrl) {
