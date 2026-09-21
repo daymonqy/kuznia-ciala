@@ -63,13 +63,13 @@
       margin-bottom: 14px;
       color: #feca57;
     }
-    label {
+    label.field {
       display: block;
       font-size: 0.8rem;
       color: #aaa;
       margin-bottom: 6px;
     }
-    input, textarea, select {
+    input, textarea {
       width: 100%;
       padding: 12px 14px;
       margin-bottom: 12px;
@@ -81,7 +81,7 @@
       outline: none;
       font-family: inherit;
     }
-    input:focus, textarea:focus, select:focus { border-color: #feca57; }
+    input:focus, textarea:focus { border-color: #feca57; }
     textarea { min-height: 80px; resize: vertical; }
     .btn-save {
       width: 100%;
@@ -93,6 +93,57 @@
       font-weight: 700;
       font-size: 1rem;
       cursor: pointer;
+    }
+
+    /* Lista wielokrotnego wyboru partii */
+    .muscle-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .muscle-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .muscle-item:hover {
+      border-color: rgba(254, 202, 87, 0.4);
+      background: rgba(254, 202, 87, 0.06);
+    }
+    .muscle-item.selected {
+      border-color: #feca57;
+      background: rgba(254, 202, 87, 0.12);
+    }
+    .muscle-item input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: #feca57;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .muscle-item .icon {
+      width: 28px;
+      text-align: center;
+      font-size: 1.15rem;
+      color: #feca57;
+      flex-shrink: 0;
+    }
+    .muscle-item .name {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #eee;
+    }
+    .muscle-item.selected .name {
+      color: #feca57;
     }
 
     .section-title {
@@ -126,9 +177,7 @@
       color: #bbb;
       line-height: 1.4;
     }
-    .card-actions {
-      margin-top: 10px;
-    }
+    .card-actions { margin-top: 10px; }
     .card-actions button {
       padding: 6px 12px;
       border-radius: 8px;
@@ -211,17 +260,16 @@
 
     <!-- ========== PROGRAM ========== -->
     <div class="panel show" id="panelProgram">
-
       <div class="form-card">
         <h3><i class="fas fa-plus-circle"></i> Utwórz program</h3>
 
-        <label for="progName">Nazwa programu</label>
+        <label class="field" for="progName">Nazwa programu</label>
         <input type="text" id="progName" placeholder="Np. Siła 4 tygodnie">
 
-        <label for="progDesc">Opis</label>
+        <label class="field" for="progDesc">Opis</label>
         <textarea id="progDesc" placeholder="Cel, długość, uwagi..."></textarea>
 
-        <label for="progWeeks">Liczba tygodni</label>
+        <label class="field" for="progWeeks">Liczba tygodni</label>
         <input type="number" id="progWeeks" min="1" max="52" value="4">
 
         <button type="button" class="btn-save" onclick="saveProgram()">Zapisz program</button>
@@ -233,26 +281,57 @@
 
     <!-- ========== ĆWICZENIA ========== -->
     <div class="panel" id="panelCwiczenia">
-
       <div class="form-card">
         <h3><i class="fas fa-plus-circle"></i> Utwórz ćwiczenie</h3>
 
-        <label for="exName">Nazwa ćwiczenia</label>
+        <label class="field" for="exName">Nazwa ćwiczenia</label>
         <input type="text" id="exName" placeholder="Np. Przysiady">
 
-        <label for="exMuscle">Partia mięśniowa</label>
-        <select id="exMuscle">
-          <option value="Nogi">Nogi</option>
-          <option value="Klatka">Klatka</option>
-          <option value="Plecy">Plecy</option>
-          <option value="Barki">Barki</option>
-          <option value="Biceps">Biceps</option>
-          <option value="Triceps">Triceps</option>
-          <option value="Brzuch">Brzuch</option>
-          <option value="Całe ciało">Całe ciało</option>
-        </select>
+        <label class="field">Partie mięśniowe (możesz wybrać kilka)</label>
+        <div class="muscle-list" id="muscleList">
+          <label class="muscle-item">
+            <input type="checkbox" name="muscle" value="Nogi">
+            <span class="icon"><i class="fas fa-shoe-prints"></i></span>
+            <span class="name">Nogi</span>
+          </label>
+          <label class="muscle-item">
+            <input type="checkbox" name="muscle" value="Klatka">
+            <span class="icon"><i class="fas fa-heart"></i></span>
+            <span class="name">Klatka</span>
+          </label>
+          <label class="muscle-item">
+            <input type="checkbox" name="muscle" value="Plecy">
+            <span class="icon"><i class="fas fa-child"></i></span>
+            <span class="name">Plecy</span>
+          </label>
+          <label class="muscle-item">
+            <input type="checkbox" name="muscle" value="Barki">
+            <span class="icon"><i class="fas fa-expand-arrows-alt"></i></span>
+            <span class="name">Barki</span>
+          </label>
+          <label class="muscle-item">
+            <input type="checkbox" name="muscle" value="Biceps">
+            <span class="icon"><i class="fas fa-hand-fist"></i></span>
+            <span class="name">Biceps</span>
+          </label>
+          <label class="muscle-item">
+            <input type="checkbox" name="muscle" value="Triceps">
+            <span class="icon"><i class="fas fa-hand-back-fist"></i></span>
+            <span class="name">Triceps</span>
+          </label>
+          <label class="muscle-item">
+            <input type="checkbox" name="muscle" value="Brzuch">
+            <span class="icon"><i class="fas fa-circle"></i></span>
+            <span class="name">Brzuch</span>
+          </label>
+          <label class="muscle-item">
+            <input type="checkbox" name="muscle" value="Całe ciało">
+            <span class="icon"><i class="fas fa-person"></i></span>
+            <span class="name">Całe ciało</span>
+          </label>
+        </div>
 
-        <label for="exDesc">Opis / wskazówki</label>
+        <label class="field" for="exDesc">Opis / wskazówki</label>
         <textarea id="exDesc" placeholder="Jak wykonać, tempo, uwagi..."></textarea>
 
         <button type="button" class="btn-save" onclick="saveExercise()">Zapisz ćwiczenie</button>
@@ -285,6 +364,25 @@
       db = firebase.firestore();
     } catch (e) {
       console.error(e);
+    }
+
+    // Podświetlanie zaznaczonych partii
+    document.querySelectorAll('.muscle-item input').forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        cb.closest('.muscle-item').classList.toggle('selected', cb.checked);
+      });
+    });
+
+    function getSelectedMuscles() {
+      var checked = document.querySelectorAll('input[name="muscle"]:checked');
+      return Array.prototype.map.call(checked, function(el) { return el.value; });
+    }
+
+    function clearMuscleSelection() {
+      document.querySelectorAll('input[name="muscle"]').forEach(function(cb) {
+        cb.checked = false;
+        cb.closest('.muscle-item').classList.remove('selected');
+      });
     }
 
     function toast(text, type) {
@@ -390,18 +488,23 @@
 
     function saveExercise() {
       var name = document.getElementById('exName').value.trim();
-      var muscle = document.getElementById('exMuscle').value;
+      var muscles = getSelectedMuscles();
       var desc = document.getElementById('exDesc').value.trim();
 
       if (!name) {
         toast('Podaj nazwę ćwiczenia', 'err');
         return;
       }
+      if (!muscles.length) {
+        toast('Wybierz przynajmniej jedną partię mięśniową', 'err');
+        return;
+      }
 
       exercises.unshift({
         id: Date.now().toString(),
         name: name,
-        muscle: muscle,
+        muscles: muscles,
+        muscle: muscles.join(', '),
         description: desc,
         createdAt: new Date().toISOString()
       });
@@ -412,7 +515,7 @@
 
       document.getElementById('exName').value = '';
       document.getElementById('exDesc').value = '';
-      document.getElementById('exMuscle').value = 'Nogi';
+      clearMuscleSelection();
       toast('Ćwiczenie zapisane!', 'ok');
     }
 
@@ -470,9 +573,10 @@
         return;
       }
       el.innerHTML = exercises.map(function(e) {
+        var muscleText = e.muscles ? e.muscles.join(', ') : (e.muscle || '');
         return '<div class="card">' +
           '<div class="card-title">' + escapeHtml(e.name) + '</div>' +
-          '<div class="card-meta">' + escapeHtml(e.muscle) + ' · ' + formatDate(e.createdAt) + '</div>' +
+          '<div class="card-meta">' + escapeHtml(muscleText) + ' · ' + formatDate(e.createdAt) + '</div>' +
           (e.description ? '<div class="card-desc">' + escapeHtml(e.description) + '</div>' : '') +
           '<div class="card-actions">' +
             '<button type="button" onclick="deleteExercise(\'' + e.id + '\')"><i class="fas fa-trash"></i> Usuń</button>' +
