@@ -1,1 +1,264 @@
-FILE_FROM_DISK
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuźnia Ciała - Biblioteka</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f0f0f,#1a1a2e,#16213e);color:#fff;min-height:100vh;padding-bottom:90px}
+.wrap{max-width:480px;margin:0 auto;padding:20px 16px}
+h1{text-align:center;font-size:1.5rem;color:#feca57;margin:12px 0 16px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(255,255,255,.05);border-radius:12px;padding:4px}
+.tabs button{flex:1;padding:12px;border:none;border-radius:10px;background:transparent;color:#888;font-size:.95rem;font-weight:600;cursor:pointer}
+.tabs button.on{background:rgba(254,202,87,.2);color:#feca57}
+.panel{display:none}.panel.show{display:block}
+.btn-create{width:100%;padding:14px;margin-bottom:16px;border:1px dashed rgba(254,202,87,.5);border-radius:12px;background:rgba(254,202,87,.08);color:#feca57;font-size:.95rem;font-weight:600;cursor:pointer}
+.form-card{display:none;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px;margin-bottom:24px}
+.form-card.show{display:block}
+.form-card h3{font-size:1.05rem;margin-bottom:14px;color:#feca57}
+label.field{display:block;font-size:.8rem;color:#aaa;margin-bottom:6px}
+input[type=text],textarea{width:100%;padding:12px 14px;margin-bottom:12px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;outline:none;font-family:inherit}
+textarea{min-height:70px;resize:vertical}
+.form-actions{display:flex;gap:10px}
+.btn-save{flex:1;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#feca57,#ff9f43);color:#0f0f0f;font-weight:700;cursor:pointer}
+.btn-cancel{flex:1;padding:14px;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:transparent;color:#aaa;font-weight:600;cursor:pointer}
+.media-box{border:1px dashed rgba(254,202,87,.4);border-radius:12px;padding:14px;text-align:center;margin-bottom:12px;background:rgba(254,202,87,.05)}
+.media-box input[type=file]{display:none}
+.media-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.media-btns label{padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#eee;font-size:.85rem;cursor:pointer;font-weight:600}
+.media-preview{margin-top:12px;display:none}.media-preview.show{display:block}
+.media-preview img,.media-preview video{max-width:100%;max-height:160px;border-radius:10px;background:#000}
+.media-remove{margin-top:8px;padding:6px 12px;border-radius:8px;border:1px solid rgba(225,112,85,.5);background:transparent;color:#e17055;font-size:.8rem;cursor:pointer}
+.filter-box{margin-bottom:16px;border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;background:rgba(0,0,0,.2)}
+.filter-header{padding:12px 14px;font-size:.85rem;font-weight:600;color:#feca57;display:flex;justify-content:space-between;align-items:center;background:rgba(254,202,87,.08)}
+.filter-header button{background:none;border:none;color:#888;font-size:.75rem;cursor:pointer;text-decoration:underline}
+.filter-body{padding:10px}
+.filter-toggle{cursor:pointer;user-select:none}
+.filter-toggle .chev{transition:transform .2s;display:inline-block;margin-left:6px}
+.filter-box.collapsed .filter-body{display:none}
+.filter-box.collapsed .chev{transform:rotate(-90deg)}
+.muscle-table{display:flex;flex-direction:column;gap:10px}
+.muscle-group{border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;background:rgba(0,0,0,.15)}
+.muscle-group-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.muscle-group-header.push{background:rgba(255,107,107,.2);color:#ff6b6b}
+.muscle-group-header.pull{background:rgba(72,219,251,.2);color:#48dbfb}
+.muscle-group-header.legs{background:rgba(254,202,87,.2);color:#feca57}
+.muscle-group-header.core{background:rgba(162,155,254,.2);color:#a29bfe}
+.muscle-grid{display:grid;grid-template-columns:1fr 1fr}
+.muscle-item{display:flex;align-items:center;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.06);cursor:pointer}
+.muscle-item:nth-child(2n){border-right:none}
+.muscle-item.selected{background:rgba(254,202,87,.12)}
+.muscle-item input{width:15px;height:15px;margin:0;accent-color:#feca57;cursor:pointer}
+.muscle-item .icon{width:20px;text-align:center;color:#feca57}
+.muscle-item .name{font-size:.78rem;color:#ddd}
+.muscle-item.selected .name{color:#feca57}
+.filter-count{font-size:.8rem;color:#888;margin:8px 0 12px;text-align:center}
+.ex-pick-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:260px;overflow-y:auto}
+.ex-pick-item{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);cursor:pointer}
+.ex-pick-item.selected{border-color:#feca57;background:rgba(254,202,87,.12)}
+.ex-pick-item input{width:16px;height:16px;margin:0;accent-color:#feca57}
+.ex-pick-name{font-size:.9rem;font-weight:600}
+.ex-pick-meta{font-size:.75rem;color:#888}
+.ex-pick-empty{text-align:center;color:#666;padding:16px;font-size:.85rem}
+.section-title{font-size:.85rem;color:#888;text-transform:uppercase;margin-bottom:8px}
+.hint{font-size:.8rem;color:#666;margin-bottom:12px;line-height:1.4}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px}
+.card-title{font-weight:700;margin-bottom:4px}
+.card-meta{font-size:.8rem;color:#888;margin-bottom:6px}
+.card-desc{font-size:.85rem;color:#bbb}
+.card-media{margin:10px 0}
+.card-media img,.card-media video{max-width:100%;max-height:150px;border-radius:10px;background:#000}
+.card-ex-list{margin-top:8px}.card-ex-list li{font-size:.85rem;color:#ccc;list-style:none;margin-bottom:4px}.card-ex-list li::before{content:"• ";color:#feca57}
+.card-actions{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+.card-actions button{padding:10px 16px;border-radius:10px;font-size:.85rem;font-weight:600;cursor:pointer;border:1px solid transparent}
+.card-actions .btn-edit{background:rgba(72,219,251,.15);border-color:rgba(72,219,251,.6);color:#48dbfb}
+.card-actions .btn-del{background:transparent;border-color:rgba(225,112,85,.5);color:#e17055}
+.empty{text-align:center;color:#666;padding:24px;background:rgba(255,255,255,.03);border-radius:12px}
+.login-gate{text-align:center;padding:28px 18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;margin-bottom:16px}
+.login-gate p{color:#aaa;margin-bottom:14px;line-height:1.5}
+.login-gate a{display:inline-block;padding:12px 24px;border-radius:12px;background:linear-gradient(135deg,#48dbfb,#0abde3);color:#0f0f0f;font-weight:700;text-decoration:none}
+.err-box{display:none;background:rgba(225,112,85,.15);border:1px solid rgba(225,112,85,.5);color:#ffb4a2;padding:12px 14px;border-radius:10px;margin-bottom:14px;font-size:.85rem;line-height:1.4}
+.err-box.show{display:block}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);padding:12px 20px;border-radius:12px;font-size:.9rem;z-index:2000;opacity:0;transition:all .3s;max-width:90%;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:#00b894;color:#fff}.toast.err{background:#e17055;color:#fff}.toast.info{background:#0984e3;color:#fff}
+.status{position:fixed;top:12px;right:12px;background:rgba(15,15,15,.9);padding:6px 14px;border-radius:20px;font-size:.75rem;color:#888;border:1px solid rgba(255,255,255,.08);z-index:10;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status.on{color:#48dbfb;border-color:rgba(72,219,251,.3)}
+.nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:rgba(15,15,15,.95);border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-around;align-items:center;z-index:1000}
+.nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#888;font-size:.7rem;width:20%}
+.nav a i{font-size:1.4rem;margin-bottom:4px}.nav a.active{color:#48dbfb}
+.hidden{display:none!important}
+.btn-add-main{width:100%;padding:12px;margin-bottom:12px;border:1px solid rgba(72,219,251,.5);border-radius:10px;background:rgba(72,219,251,.1);color:#48dbfb;font-weight:600;cursor:pointer;font-size:.9rem}
+.ex-picker-box{display:none;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;margin-bottom:14px}
+.ex-picker-box.show{display:block}
+.ex-picker-box select{width:100%;padding:12px 14px;margin-bottom:12px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;outline:none}
+.ex-picker-box select option{background:#1a1a2e;color:#fff}
+.picker-results{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.picker-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)}
+.picker-info{flex:1;min-width:0}
+.btn-add-ex{padding:8px 12px;border-radius:8px;border:1px solid rgba(254,202,87,.5);background:rgba(254,202,87,.15);color:#feca57;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.draft-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.draft-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px}
+.draft-top{display:flex;align-items:center;gap:8px}
+.draft-num{color:#feca57;font-weight:700;min-width:22px}
+.draft-name{flex:1;font-weight:600;font-size:.95rem}
+.draft-order{display:flex;gap:4px}
+.draft-order button{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#ccc;cursor:pointer}
+.draft-order button:disabled{opacity:.3;cursor:default}
+.draft-remove{border-color:rgba(225,112,85,.5)!important;color:#e17055!important}
+.draft-meta{font-size:.75rem;color:#888;margin:6px 0 8px 22px}
+.draft-sets{display:flex;gap:10px;margin-left:22px;flex-wrap:wrap}
+.draft-sets label{font-size:.75rem;color:#aaa;display:flex;flex-direction:column;gap:4px}
+.draft-sets input{width:90px;padding:8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:8px;background:rgba(255,255,255,.06);color:#fff;font-size:.9rem}
+.draft-sets input[type=text]{width:110px}
+</style>
+</head>
+<body>
+<div class="status" id="status"><i class="fas fa-user"></i> Gość</div>
+<div class="toast" id="toast"></div>
+<div class="wrap">
+<h1>Biblioteka</h1>
+<div class="err-box" id="errBox"></div>
+<div id="loginGate" class="login-gate">
+<p><i class="fas fa-lock"></i><br>Musisz być zalogowany, żeby zapisywać i edytować ćwiczenia.</p>
+<a href="ty.html">Przejdź do logowania</a>
+</div>
+<div id="appContent" class="hidden">
+<div class="tabs">
+<button type="button" id="tabProgram" class="on" onclick="showProgram()">Program</button>
+<button type="button" id="tabCwiczenia" onclick="showCwiczenia()">Ćwiczenia</button>
+</div>
+<div class="panel show" id="panelProgram">
+<button type="button" class="btn-create" onclick="openProgramForm()"><i class="fas fa-plus"></i> Utwórz program</button>
+<div class="form-card" id="formProgram">
+<h3>Nowy program</h3>
+<label class="field">Nazwa programu</label>
+<input type="text" id="progName" placeholder="Np. Siła pełnego ciała">
+<label class="field">Opis (opcjonalnie)</label>
+<textarea id="progDesc" placeholder="Cel, uwagi..."></textarea>
+<label class="field">Ćwiczenia w programie</label>
+<button type="button" class="btn-add-main" onclick="showExercisePicker()"><i class="fas fa-plus"></i> Dodaj ćwiczenie</button>
+<div id="exPickerBox" class="ex-picker-box">
+<label class="field">Szukaj po nazwie</label>
+<input type="text" id="pickerSearch" placeholder="Wpisz nazwę..." oninput="renderPickerResults()">
+<label class="field">Filtr partii mięśniowej</label>
+<select id="pickerMuscle" onchange="renderPickerResults()">
+<option value="">Wszystkie partie</option>
+<option value="Klatka piersiowa">Klatka piersiowa</option>
+<option value="Barki">Barki</option>
+<option value="Triceps">Triceps</option>
+<option value="Plecy">Plecy</option>
+<option value="Biceps">Biceps</option>
+<option value="Przedramiona">Przedramiona</option>
+<option value="Czworogłowy uda">Czworogłowy uda</option>
+<option value="Kulszowo-goleniowe">Kulszowo-goleniowe</option>
+<option value="Biodra">Biodra</option>
+<option value="Łydki">Łydki</option>
+<option value="Mięśnie brzucha">Mięśnie brzucha</option>
+</select>
+<div id="pickerResults" class="picker-results"></div>
+<button type="button" class="btn-cancel" style="margin-top:8px;width:100%" onclick="hideExercisePicker()">Zamknij listę</button>
+</div>
+<div id="draftExList" class="draft-list"></div>
+<div class="form-actions">
+<button type="button" class="btn-cancel" onclick="closeProgramForm()">Anuluj</button>
+<button type="button" class="btn-save" id="btnSaveProg" onclick="saveProgram()">Zapisz program</button>
+</div>
+</div>
+<div class="section-title">Programy na koncie</div>
+<div class="list" id="listProgram"></div>
+</div>
+<div class="panel" id="panelCwiczenia">
+<button type="button" class="btn-create" onclick="openExerciseForm()"><i class="fas fa-plus"></i> Utwórz ćwiczenie</button>
+<div class="form-card" id="formExercise">
+<h3>Nowe ćwiczenie</h3>
+<label class="field">Nazwa</label>
+<input type="text" id="exName" placeholder="Np. Przysiady">
+<label class="field">Partie mięśniowe</label>
+<div class="muscle-table" id="createMuscles">
+<div class="muscle-group"><div class="muscle-group-header push">Push</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Klatka piersiowa"><span class="icon"><i class="fas fa-heart"></i></span><span class="name">Klatka piersiowa</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Barki"><span class="icon"><i class="fas fa-expand-arrows-alt"></i></span><span class="name">Barki</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Triceps"><span class="icon"><i class="fas fa-hand-back-fist"></i></span><span class="name">Triceps</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header pull">Pull</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Plecy"><span class="icon"><i class="fas fa-child"></i></span><span class="name">Plecy</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Biceps"><span class="icon"><i class="fas fa-hand-fist"></i></span><span class="name">Biceps</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Przedramiona"><span class="icon"><i class="fas fa-hands"></i></span><span class="name">Przedramiona</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header legs">Nogi</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Czworogłowy uda"><span class="icon"><i class="fas fa-person-walking"></i></span><span class="name">Czworogłowy uda</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Kulszowo-goleniowe"><span class="icon"><i class="fas fa-person-running"></i></span><span class="name">Kulszowo-goleniowe</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Biodra"><span class="icon"><i class="fas fa-arrows-alt-h"></i></span><span class="name">Biodra</span></label>
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Łydki"><span class="icon"><i class="fas fa-shoe-prints"></i></span><span class="name">Łydki</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header core">Korpus</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="muscle" value="Mięśnie brzucha"><span class="icon"><i class="fas fa-circle-notch"></i></span><span class="name">Mięśnie brzucha</span></label>
+</div></div>
+</div>
+<label class="field">Zdjęcie/wideo (opcjonalnie, max 0.7 MB)</label>
+<div class="media-box">
+<div class="media-btns">
+<label for="exImage"><i class="fas fa-image"></i> Zdjęcie</label>
+<input type="file" id="exImage" accept="image/*" onchange="onMediaSelect(event,'image')">
+<label for="exVideo"><i class="fas fa-video"></i> Wideo</label>
+<input type="file" id="exVideo" accept="video/*" onchange="onMediaSelect(event,'video')">
+</div>
+<div class="media-preview" id="mediaPreview"><div id="mediaContent"></div>
+<button type="button" class="media-remove" onclick="clearMedia()">Usuń media</button></div>
+</div>
+<label class="field">Opis</label>
+<textarea id="exDesc"></textarea>
+<div class="form-actions">
+<button type="button" class="btn-cancel" onclick="closeExerciseForm()">Anuluj</button>
+<button type="button" class="btn-save" id="btnSaveEx" onclick="saveExercise()">Zapisz na konto</button>
+</div>
+</div>
+<div class="filter-box collapsed">
+<div class="filter-header filter-toggle" onclick="toggleFilter()"><span><i class="fas fa-filter"></i> Filtr <i class="fas fa-chevron-down chev"></i></span><button type="button" onclick="event.stopPropagation();clearFilter()">Wyczyść</button></div>
+<div class="filter-body"><div class="muscle-table" id="filterMuscles">
+<div class="muscle-group"><div class="muscle-group-header push">Push</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Klatka piersiowa" onchange="applyFilter()"><span class="icon"><i class="fas fa-heart"></i></span><span class="name">Klatka</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Barki" onchange="applyFilter()"><span class="icon"><i class="fas fa-expand-arrows-alt"></i></span><span class="name">Barki</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Triceps" onchange="applyFilter()"><span class="icon"><i class="fas fa-hand-back-fist"></i></span><span class="name">Triceps</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header pull">Pull</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Plecy" onchange="applyFilter()"><span class="icon"><i class="fas fa-child"></i></span><span class="name">Plecy</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Biceps" onchange="applyFilter()"><span class="icon"><i class="fas fa-hand-fist"></i></span><span class="name">Biceps</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Przedramiona" onchange="applyFilter()"><span class="icon"><i class="fas fa-hands"></i></span><span class="name">Przedramiona</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header legs">Nogi</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Czworogłowy uda" onchange="applyFilter()"><span class="icon"><i class="fas fa-person-walking"></i></span><span class="name">Czworogłowy</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Kulszowo-goleniowe" onchange="applyFilter()"><span class="icon"><i class="fas fa-person-running"></i></span><span class="name">Kulszowo-gol.</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Biodra" onchange="applyFilter()"><span class="icon"><i class="fas fa-arrows-alt-h"></i></span><span class="name">Biodra</span></label>
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Łydki" onchange="applyFilter()"><span class="icon"><i class="fas fa-shoe-prints"></i></span><span class="name">Łydki</span></label>
+</div></div>
+<div class="muscle-group"><div class="muscle-group-header core">Korpus</div><div class="muscle-grid">
+<label class="muscle-item"><input type="checkbox" name="filterMuscle" value="Mięśnie brzucha" onchange="applyFilter()"><span class="icon"><i class="fas fa-circle-notch"></i></span><span class="name">Brzuch</span></label>
+</div></div>
+</div></div></div>
+<div class="filter-count" id="filterCount"></div>
+<div class="section-title">Ćwiczenia na koncie</div>
+<p class="hint">Przy każdym ćwiczeniu jest przycisk <strong style="color:#48dbfb">Edytuj</strong> – kliknij, aby zmienić dane.</p>
+<div class="list" id="listExercise"></div>
+</div>
+</div>
+</div>
+<nav class="nav">
+<a href="index.html"><i class="fas fa-home"></i><span>Główna</span></a>
+<a href="eksploruj.html"><i class="fas fa-search"></i><span>Eksploruj</span></a>
+<a href="trening.html"><i class="fas fa-dumbbell"></i><span>Trening</span></a>
+<a href="biblioteka.html" class="active"><i class="fas fa-book"></i><span>Biblioteka</span></a>
+<a href="ty.html"><i class="fas fa-user"></i><span>Ty</span></a>
+</nav>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js?v=5"></script>
+<script src="js/firestore-helper.js?v=5"></script>
+<script src="js/biblioteka-app.js?v=5"></script>
+</body>
+</html>
