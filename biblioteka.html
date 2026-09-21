@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>Kuźnia Ciała - Biblioteka</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
@@ -55,13 +56,9 @@ textarea{min-height:70px;resize:vertical}
 .muscle-item .name{font-size:.78rem;color:#ddd}
 .muscle-item.selected .name{color:#feca57}
 .filter-count{font-size:.8rem;color:#888;margin:8px 0 12px;text-align:center}
-.ex-pick-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:260px;overflow-y:auto}
-.ex-pick-item{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);cursor:pointer}
-.ex-pick-item.selected{border-color:#feca57;background:rgba(254,202,87,.12)}
-.ex-pick-item input{width:16px;height:16px;margin:0;accent-color:#feca57}
+.ex-pick-empty{text-align:center;color:#666;padding:16px;font-size:.85rem}
 .ex-pick-name{font-size:.9rem;font-weight:600}
 .ex-pick-meta{font-size:.75rem;color:#888}
-.ex-pick-empty{text-align:center;color:#666;padding:16px;font-size:.85rem}
 .section-title{font-size:.85rem;color:#888;text-transform:uppercase;margin-bottom:8px}
 .hint{font-size:.8rem;color:#666;margin-bottom:12px;line-height:1.4}
 .list{display:flex;flex-direction:column;gap:10px}
@@ -242,7 +239,7 @@ textarea{min-height:70px;resize:vertical}
 </div></div></div>
 <div class="filter-count" id="filterCount"></div>
 <div class="section-title">Ćwiczenia na koncie</div>
-<p class="hint">Przy każdym ćwiczeniu jest przycisk <strong style="color:#48dbfb">Edytuj</strong> – kliknij, aby zmienić dane.</p>
+<p class="hint">Przy każdym ćwiczeniu jest przycisk <strong style="color:#48dbfb">Edytuj</strong>.</p>
 <div class="list" id="listExercise"></div>
 </div>
 </div>
@@ -257,8 +254,8 @@ textarea{min-height:70px;resize:vertical}
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js?v=5"></script>
-<script src="js/firestore-helper.js?v=5"></script>
-<script src="js/biblioteka-app.js?v=5"></script>
+<script src="js/firebase-config.js?v=6"></script>
+<script src="js/firestore-helper.js?v=6"></script>
+<script src="js/biblioteka-app.js?v=6"></script>
 </body>
 </html>
