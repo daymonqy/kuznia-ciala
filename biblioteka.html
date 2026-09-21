@@ -51,33 +51,15 @@
     .panel { display: none; }
     .panel.show { display: block; }
 
-    .btn-create {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 20px;
-      border: 1px dashed rgba(254, 202, 87, 0.5);
-      border-radius: 12px;
-      background: rgba(254, 202, 87, 0.08);
-      color: #feca57;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .btn-create:hover {
-      background: rgba(254, 202, 87, 0.15);
-    }
-
     .form-card {
-      display: none;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 14px;
       padding: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
-    .form-card.show { display: block; }
     .form-card h3 {
-      font-size: 1rem;
+      font-size: 1.05rem;
       margin-bottom: 14px;
       color: #feca57;
     }
@@ -101,32 +83,25 @@
     }
     input:focus, textarea:focus, select:focus { border-color: #feca57; }
     textarea { min-height: 80px; resize: vertical; }
-    .form-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 4px;
-    }
     .btn-save {
-      flex: 1;
-      padding: 12px;
+      width: 100%;
+      padding: 14px;
       border: none;
       border-radius: 10px;
       background: linear-gradient(135deg, #feca57, #ff9f43);
       color: #0f0f0f;
       font-weight: 700;
-      cursor: pointer;
-    }
-    .btn-cancel {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 10px;
-      background: transparent;
-      color: #aaa;
-      font-weight: 600;
+      font-size: 1rem;
       cursor: pointer;
     }
 
+    .section-title {
+      font-size: 0.85rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
     .list { display: flex; flex-direction: column; gap: 10px; }
     .card {
       background: rgba(255,255,255,0.05);
@@ -153,27 +128,23 @@
     }
     .card-actions {
       margin-top: 10px;
-      display: flex;
-      gap: 8px;
     }
     .card-actions button {
       padding: 6px 12px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.15);
+      border: 1px solid rgba(225, 112, 85, 0.4);
       background: transparent;
-      color: #888;
+      color: #e17055;
       font-size: 0.75rem;
       cursor: pointer;
-    }
-    .card-actions button.del {
-      color: #e17055;
-      border-color: rgba(225, 112, 85, 0.4);
     }
     .empty {
       text-align: center;
       color: #666;
-      padding: 32px 16px;
+      padding: 24px 16px;
       font-size: 0.9rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
     }
     .toast {
       position: fixed;
@@ -238,14 +209,12 @@
       <button type="button" id="tabCwiczenia" onclick="showCwiczenia()">Ćwiczenia</button>
     </div>
 
-    <!-- PANEL PROGRAM -->
+    <!-- ========== PROGRAM ========== -->
     <div class="panel show" id="panelProgram">
-      <button type="button" class="btn-create" onclick="openProgramForm()">
-        <i class="fas fa-plus"></i> Utwórz program
-      </button>
 
-      <div class="form-card" id="formProgram">
-        <h3>Nowy program</h3>
+      <div class="form-card">
+        <h3><i class="fas fa-plus-circle"></i> Utwórz program</h3>
+
         <label for="progName">Nazwa programu</label>
         <input type="text" id="progName" placeholder="Np. Siła 4 tygodnie">
 
@@ -253,25 +222,21 @@
         <textarea id="progDesc" placeholder="Cel, długość, uwagi..."></textarea>
 
         <label for="progWeeks">Liczba tygodni</label>
-        <input type="number" id="progWeeks" min="1" max="52" value="4" placeholder="4">
+        <input type="number" id="progWeeks" min="1" max="52" value="4">
 
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" onclick="closeProgramForm()">Anuluj</button>
-          <button type="button" class="btn-save" onclick="saveProgram()">Zapisz</button>
-        </div>
+        <button type="button" class="btn-save" onclick="saveProgram()">Zapisz program</button>
       </div>
 
+      <div class="section-title">Twoje programy</div>
       <div class="list" id="listProgram"></div>
     </div>
 
-    <!-- PANEL ĆWICZENIA -->
+    <!-- ========== ĆWICZENIA ========== -->
     <div class="panel" id="panelCwiczenia">
-      <button type="button" class="btn-create" onclick="openExerciseForm()">
-        <i class="fas fa-plus"></i> Utwórz ćwiczenie
-      </button>
 
-      <div class="form-card" id="formExercise">
-        <h3>Nowe ćwiczenie</h3>
+      <div class="form-card">
+        <h3><i class="fas fa-plus-circle"></i> Utwórz ćwiczenie</h3>
+
         <label for="exName">Nazwa ćwiczenia</label>
         <input type="text" id="exName" placeholder="Np. Przysiady">
 
@@ -290,12 +255,10 @@
         <label for="exDesc">Opis / wskazówki</label>
         <textarea id="exDesc" placeholder="Jak wykonać, tempo, uwagi..."></textarea>
 
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" onclick="closeExerciseForm()">Anuluj</button>
-          <button type="button" class="btn-save" onclick="saveExercise()">Zapisz</button>
-        </div>
+        <button type="button" class="btn-save" onclick="saveExercise()">Zapisz ćwiczenie</button>
       </div>
 
+      <div class="section-title">Twoje ćwiczenia</div>
       <div class="list" id="listExercise"></div>
     </div>
   </div>
@@ -345,29 +308,6 @@
       document.getElementById('tabProgram').classList.remove('on');
     }
 
-    function openProgramForm() {
-      document.getElementById('formProgram').classList.add('show');
-      document.getElementById('progName').focus();
-    }
-    function closeProgramForm() {
-      document.getElementById('formProgram').classList.remove('show');
-      document.getElementById('progName').value = '';
-      document.getElementById('progDesc').value = '';
-      document.getElementById('progWeeks').value = '4';
-    }
-
-    function openExerciseForm() {
-      document.getElementById('formExercise').classList.add('show');
-      document.getElementById('exName').focus();
-    }
-    function closeExerciseForm() {
-      document.getElementById('formExercise').classList.remove('show');
-      document.getElementById('exName').value = '';
-      document.getElementById('exDesc').value = '';
-      document.getElementById('exMuscle').value = 'Nogi';
-    }
-
-    // ---- Zapis lokalny (działa zawsze) + Firebase gdy zalogowany ----
     function storageKey(kind) {
       var uid = currentUser ? currentUser.uid : 'guest';
       return 'kuznia_' + kind + '_' + uid;
@@ -430,19 +370,21 @@
         return;
       }
 
-      var item = {
+      programs.unshift({
         id: Date.now().toString(),
         name: name,
         description: desc,
         weeks: weeks,
         createdAt: new Date().toISOString()
-      };
+      });
 
-      programs.unshift(item);
       saveLocal();
       syncToCloud();
       renderPrograms();
-      closeProgramForm();
+
+      document.getElementById('progName').value = '';
+      document.getElementById('progDesc').value = '';
+      document.getElementById('progWeeks').value = '4';
       toast('Program zapisany!', 'ok');
     }
 
@@ -456,19 +398,21 @@
         return;
       }
 
-      var item = {
+      exercises.unshift({
         id: Date.now().toString(),
         name: name,
         muscle: muscle,
         description: desc,
         createdAt: new Date().toISOString()
-      };
+      });
 
-      exercises.unshift(item);
       saveLocal();
       syncToCloud();
       renderExercises();
-      closeExerciseForm();
+
+      document.getElementById('exName').value = '';
+      document.getElementById('exDesc').value = '';
+      document.getElementById('exMuscle').value = 'Nogi';
       toast('Ćwiczenie zapisane!', 'ok');
     }
 
@@ -490,40 +434,6 @@
       toast('Ćwiczenie usunięte', 'info');
     }
 
-    function renderPrograms() {
-      var el = document.getElementById('listProgram');
-      if (!programs.length) {
-        el.innerHTML = '<div class="empty">Brak programów.<br>Kliknij „Utwórz program”, aby dodać pierwszy.</div>';
-        return;
-      }
-      el.innerHTML = programs.map(function(p) {
-        return '<div class="card">' +
-          '<div class="card-title">' + escapeHtml(p.name) + '</div>' +
-          '<div class="card-meta">' + p.weeks + ' tyg. · ' + formatDate(p.createdAt) + '</div>' +
-          (p.description ? '<div class="card-desc">' + escapeHtml(p.description) + '</div>' : '') +
-          '<div class="card-actions">' +
-            '<button type="button" class="del" onclick="deleteProgram(\'' + p.id + '\')"><i class="fas fa-trash"></i> Usuń</button>' +
-          '</div></div>';
-      }).join('');
-    }
-
-    function renderExercises() {
-      var el = document.getElementById('listExercise');
-      if (!exercises.length) {
-        el.innerHTML = '<div class="empty">Brak ćwiczeń.<br>Kliknij „Utwórz ćwiczenie”, aby dodać pierwsze.</div>';
-        return;
-      }
-      el.innerHTML = exercises.map(function(e) {
-        return '<div class="card">' +
-          '<div class="card-title">' + escapeHtml(e.name) + '</div>' +
-          '<div class="card-meta">' + escapeHtml(e.muscle) + ' · ' + formatDate(e.createdAt) + '</div>' +
-          (e.description ? '<div class="card-desc">' + escapeHtml(e.description) + '</div>' : '') +
-          '<div class="card-actions">' +
-            '<button type="button" class="del" onclick="deleteExercise(\'' + e.id + '\')"><i class="fas fa-trash"></i> Usuń</button>' +
-          '</div></div>';
-      }).join('');
-    }
-
     function escapeHtml(s) {
       if (!s) return '';
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -532,12 +442,44 @@
     function formatDate(iso) {
       if (!iso) return '';
       try {
-        var d = new Date(iso);
-        return d.toLocaleDateString('pl-PL');
+        return new Date(iso).toLocaleDateString('pl-PL');
       } catch (e) { return ''; }
     }
 
-    // Auth status
+    function renderPrograms() {
+      var el = document.getElementById('listProgram');
+      if (!programs.length) {
+        el.innerHTML = '<div class="empty">Brak zapisanych programów</div>';
+        return;
+      }
+      el.innerHTML = programs.map(function(p) {
+        return '<div class="card">' +
+          '<div class="card-title">' + escapeHtml(p.name) + '</div>' +
+          '<div class="card-meta">' + p.weeks + ' tyg. · ' + formatDate(p.createdAt) + '</div>' +
+          (p.description ? '<div class="card-desc">' + escapeHtml(p.description) + '</div>' : '') +
+          '<div class="card-actions">' +
+            '<button type="button" onclick="deleteProgram(\'' + p.id + '\')"><i class="fas fa-trash"></i> Usuń</button>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    function renderExercises() {
+      var el = document.getElementById('listExercise');
+      if (!exercises.length) {
+        el.innerHTML = '<div class="empty">Brak zapisanych ćwiczeń</div>';
+        return;
+      }
+      el.innerHTML = exercises.map(function(e) {
+        return '<div class="card">' +
+          '<div class="card-title">' + escapeHtml(e.name) + '</div>' +
+          '<div class="card-meta">' + escapeHtml(e.muscle) + ' · ' + formatDate(e.createdAt) + '</div>' +
+          (e.description ? '<div class="card-desc">' + escapeHtml(e.description) + '</div>' : '') +
+          '<div class="card-actions">' +
+            '<button type="button" onclick="deleteExercise(\'' + e.id + '\')"><i class="fas fa-trash"></i> Usuń</button>' +
+          '</div></div>';
+      }).join('');
+    }
+
     if (auth) {
       auth.onAuthStateChanged(function(user) {
         currentUser = user;
