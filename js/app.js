@@ -1,16 +1,9 @@
 const App = {
   currentView: 'dashboard',
+  _authReady: false,
 
   init() {
-    setTimeout(() => {
-      document.getElementById('loading-screen').classList.remove('active');
-      if (!Storage.isOnboarded() || !Storage.getUser()) {
-        document.getElementById('onboarding-screen').classList.add('active');
-        Profile.start();
-      } else {
-        this.showMain();
-      }
-    }, 600);
+    AuthApp.init();
 
     document.querySelectorAll('.nav-item').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -30,14 +23,60 @@ const App = {
     document.getElementById('modal-overlay')?.addEventListener('click', e => {
       if (e.target.id === 'modal-overlay') Utils.closeModal();
     });
+
+    if (typeof firebase === 'undefined') {
+      document.getElementById('loading-screen')?.classList.remove('active');
+      this.showAuth('Brak Firebase — odśwież stronę');
+      return;
+    }
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      document.getElementById('loading-screen')?.classList.remove('active');
+      if (user) {
+        Storage.setAuthUid(user.uid);
+        await Storage.loadFromCloud(user.uid);
+        let profile = Storage.getUser();
+        if (!profile || !profile.username) {
+          profile = {
+            id: user.uid,
+            username: user.displayName || (user.email || 'U').split('@')[0],
+            email: user.email || '',
+            avatar: ((user.displayName || user.email || 'U')[0] || 'U').toUpperCase(),
+            goal: 'general',
+            level: 'beginner',
+            createdAt: new Date().toISOString()
+          };
+          Storage.saveUser(profile);
+          await Storage.syncToCloud();
+        } else if (!profile.email && user.email) {
+          profile.email = user.email;
+          Storage.saveUser(profile);
+        }
+        this.showMain();
+      } else {
+        Storage.setAuthUid(null);
+        this.showAuth();
+      }
+      this._authReady = true;
+    });
+  },
+
+  showAuth(extraMsg) {
+    document.getElementById('onboarding-screen')?.classList.remove('active');
+    document.getElementById('main-app')?.classList.remove('active');
+    document.getElementById('auth-screen')?.classList.add('active');
+    AuthApp.showLogin();
+    if (extraMsg) AuthApp.msg(extraMsg, 'error');
   },
 
   showMain() {
-    document.getElementById('onboarding-screen').classList.remove('active');
-    document.getElementById('main-app').classList.add('active');
+    document.getElementById('auth-screen')?.classList.remove('active');
+    document.getElementById('onboarding-screen')?.classList.remove('active');
+    document.getElementById('main-app')?.classList.add('active');
     const user = Storage.getUser();
     if (user) {
-      document.getElementById('header-avatar').textContent = user.avatar || 'U';
+      const av = document.getElementById('header-avatar');
+      if (av) av.textContent = user.avatar || (user.username || 'U')[0].toUpperCase();
     }
     this.navigate('dashboard');
   },
@@ -53,62 +92,50 @@ const App = {
   refresh() {
     const content = document.getElementById('content');
     if (!content) return;
-
     let html = '';
     switch (this.currentView) {
       case 'dashboard':
-        html = Dashboard.render();
-        content.innerHTML = html;
+        content.innerHTML = Dashboard.render();
         Dashboard.bind();
         break;
       case 'exercises':
-        html = Exercises.render();
-        content.innerHTML = html;
+        content.innerHTML = Exercises.render();
         Exercises.bind();
         break;
       case 'workout':
       case 'plans':
-        html = Plans.render();
-        content.innerHTML = html;
+        content.innerHTML = Plans.render();
         Plans.bind();
         break;
       case 'live':
-        html = Workout.render();
-        content.innerHTML = html;
+        content.innerHTML = Workout.render();
         Workout.bind();
         break;
       case 'progress':
-        html = Progress.render();
-        content.innerHTML = html;
+        content.innerHTML = Progress.render();
         Progress.bind();
         break;
       case 'history':
-        html = History.render();
-        content.innerHTML = html;
+        content.innerHTML = History.render();
         History.bind();
         break;
       case 'recovery':
-        html = Recovery.render();
-        content.innerHTML = html;
+        content.innerHTML = Recovery.render();
         Recovery.bind();
         break;
       case 'calculator':
-        html = Calculator.render();
-        content.innerHTML = html;
+        content.innerHTML = Calculator.render();
         Calculator.bind();
         break;
       case 'records':
-        html = Progress.render();
-        content.innerHTML = html;
+        content.innerHTML = Progress.render();
         break;
       case 'profile':
-        html = Profile.renderView();
-        content.innerHTML = html;
+        content.innerHTML = Profile.renderView();
         Profile.bindView();
         break;
       case 'settings':
-        html = Settings.render();
-        content.innerHTML = html;
+        content.innerHTML = Settings.render();
         Settings.bind();
         break;
       default:
