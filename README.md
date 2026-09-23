@@ -1,78 +1,69 @@
 # Kuźnia Ciała
 
-Aplikacja fitness z systemem logowania e-mail i danymi przypisanymi do konta użytkownika.
+Aplikacja fitness (SPA) z logowaniem e-mail i danymi przypisanymi do konta użytkownika.
 
 **Strona:** https://daymonqy.github.io/kuznia-ciala/
 
 ---
 
-## System logowania (Firebase)
+## Funkcje
 
-Wszystkie dane użytkownika (treningi, ulubione, postępy) są zapisywane w chmurze pod jego unikalnym kontem.
-
-### Krok po kroku – konfiguracja Firebase (raz)
-
-1. Wejdź na **[console.firebase.google.com](https://console.firebase.google.com)** i zaloguj się kontem Google.
-2. Kliknij **„Dodaj projekt”** → nazwij go np. `kuznia-ciala` → utwórz.
-3. W projekcie kliknij ikonę **Web** (`</>`) → zarejestruj aplikację (nazwa dowolna).
-4. Skopiuj obiekt `firebaseConfig` (apiKey, authDomain, projectId itd.).
-5. Otwórz plik **`js/firebase-config.js`** w tym repozytorium i wklej swoje dane w miejsce placeholderów.
-6. W Firebase Console:
-   - **Authentication** → **Sign-in method** → włącz **Email/Password** → Zapisz.
-   - **Firestore Database** → **Utwórz bazę danych** → wybierz lokalizację (np. `europe-west`) → tryb **testowy** (na start).
-7. (Opcjonalnie) W Firestore → **Rules** ustaw na produkcję:
-   ```
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /users/{userId} {
-         allow read, write: if request.auth != null && request.auth.uid == userId;
-       }
-     }
-   }
-   ```
-8. Commit i push zmian w `firebase-config.js` (lub edytuj przez GitHub web).
-
-Po tym logowanie i rejestracja działają. Dane są przypisane do konta.
+- Logowanie / rejestracja (Firebase Auth)
+- Baza ćwiczeń z filtrem partii i wyszukiwarką
+- Plany treningowe (serie, RIR, kolejność ćwiczeń)
+- Trening na żywo, historia, regeneracja, postęp
+- Dane synchronizowane z Firestore pod UID użytkownika
 
 ---
 
-## Jak to działa
+## Konfiguracja Firebase
 
-| Funkcja | Opis |
-|---------|------|
-| Rejestracja | E-mail + hasło → tworzy konto i dokument użytkownika w Firestore |
-| Logowanie | E-mail + hasło → sesja utrzymywana automatycznie |
-| Wylogowanie | Zakładka **Ty** |
-| Zapisywanie danych | Funkcje `saveWorkout()`, `addToUserArray()`, `saveUserData()` – zawsze pod UID zalogowanego użytkownika |
-| Status | W prawym górnym rogu widać e-mail lub „Gość” |
+1. [console.firebase.google.com](https://console.firebase.google.com) → projekt
+2. Authentication → Email/Password → włącz
+3. Firestore → utwórz bazę
+4. Wklej config do **`js/firebase-config.js`**
 
-### Przykład zapisu treningu (już jest na stronie Trening)
+Reguły (przykład):
 
-```js
-await saveWorkout({
-  name: 'Trening pełnego ciała',
-  exercises: ['Przysiady', 'Pompki'],
-  duration: 45
-});
 ```
-
-Dane trafiają do `users/{uid}/workouts` i są widoczne tylko dla tego użytkownika.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
 
 ---
 
-## Struktura plików
+## Struktura
 
 ```
-├── index.html          # Główna
-├── eksploruj.html
-├── trening.html        # Przykład zapisu danych do konta
-├── biblioteka.html
-├── ty.html             # Logowanie / rejestracja / profil
-├── css/auth.css
+├── index.html              # Shell SPA
+├── css/
+│   ├── styles.css          # Style bazowe
+│   └── refine.css          # Motyw + UI ćwiczeń
+├── data/
+│   └── exercises.js        # Baza ćwiczeń + MUSCLE_GROUPS
 ├── js/
-│   ├── firebase-config.js   ← TUTAJ wstaw swoje klucze Firebase
-│   └── auth.js              # Logika logowania i zapisu danych
+│   ├── firebase-config.js
+│   ├── auth-app.js         # Logowanie / rejestracja
+│   ├── storage.js          # LocalStorage + sync Firestore
+│   ├── utils.js
+│   ├── app.js              # Nawigacja SPA
+│   └── modules/
+│       ├── dashboard.js
+│       ├── exercises.js
+│       ├── plans.js
+│       ├── workout.js
+│       ├── history.js
+│       ├── recovery.js
+│       ├── progress.js
+│       ├── calculator.js
+│       ├── profile.js
+│       └── settings.js
 └── README.md
 ```
 
@@ -80,5 +71,5 @@ Dane trafiają do `users/{uid}/workouts` i są widoczne tylko dla tego użytkown
 
 ## GitHub Pages
 
-Settings → Pages → Source: **main** / **root** → Save  
+Settings → Pages → Source: **main** / **root**  
 Adres: `https://daymonqy.github.io/kuznia-ciala/`
