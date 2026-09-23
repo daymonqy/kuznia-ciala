@@ -88,9 +88,7 @@ const Workout = {
     const exIdx = this.active._currentEx ?? 0;
     const ex = this.active.exercises[exIdx];
 
-    if (!ex) {
-      return this.renderEmptyLive();
-    }
+    if (!ex) return this.renderEmptyLive();
 
     const hist = Storage.getExerciseHistory(ex.exerciseId);
     const lastSets = hist[0]?.sets?.filter(s => s.type !== 'warmup').slice(0, 3) || [];
@@ -123,10 +121,7 @@ const Workout = {
         </div>
 
         <div class="set-labels">
-          <div>#</div>
-          <div>Ciężar</div>
-          <div>Powt.</div>
-          <div>${isBeginner ? 'OK' : 'RIR'}</div>
+          <div>#</div><div>Ciężar</div><div>Powt.</div><div>${isBeginner ? 'OK' : 'RIR'}</div>
         </div>
 
         ${ex.sets.map((s, i) => `
@@ -142,12 +137,10 @@ const Workout = {
           <div class="set-num">${completedSets + 1}</div>
           <input class="set-input" type="number" id="set-weight" step="0.5" min="0"
             value="${ex.suggestedWeight || (lastSets[0]?.weight ?? '')}" placeholder="kg">
-          <input class="set-input" type="number" id="set-reps" min="0" max="100"
-            value="" placeholder="powt">
+          <input class="set-input" type="number" id="set-reps" min="0" max="100" value="" placeholder="powt">
           ${isBeginner
             ? `<button class="btn btn-accent" id="btn-save-set" style="padding:10px">✓</button>`
-            : `<input class="set-input" type="number" id="set-rir" min="0" max="5" step="1" value="${ex.plannedRir ?? 2}" placeholder="RIR">`
-          }
+            : `<input class="set-input" type="number" id="set-rir" min="0" max="5" step="1" value="${ex.plannedRir ?? 2}" placeholder="RIR">`}
         </div>
 
         ${!isBeginner ? `
@@ -157,7 +150,6 @@ const Workout = {
           <div class="rir-value" id="rir-display">${ex.plannedRir ?? 2}</div>
           <div class="rir-desc" id="rir-desc">${this.rirLabel(ex.plannedRir ?? 2)}</div>
         </div>
-
         <div class="flex gap-8 mt-12">
           <div class="form-group" style="flex:1;margin:0">
             <label>RPE (1-10)</label>
@@ -168,29 +160,20 @@ const Workout = {
             <input class="form-input" type="number" id="set-rip" min="1" max="5" placeholder="opc.">
           </div>
         </div>
-
         <div class="form-group mt-12">
           <label>Typ serii</label>
           <select class="form-select" id="set-type">
             ${SET_TYPES.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
           </select>
-        </div>
-        ` : ''}
+        </div>` : ''}
 
-        <button class="btn btn-primary btn-lg btn-block mt-16" id="btn-save-set">
-          Zapisz serię ${completedSets + 1}
-        </button>
-
+        <button class="btn btn-primary btn-lg btn-block mt-16" id="btn-save-set">Zapisz serię ${completedSets + 1}</button>
         <div class="flex gap-8 mt-12">
           <button class="btn btn-secondary" id="btn-skip-set" style="flex:1">Pomiń</button>
           <button class="btn btn-secondary" id="btn-add-set" style="flex:1">+ Seria</button>
         </div>
       </div>
-
-      <div class="text-sm text-muted text-center">
-        Seria ${completedSets + 1} / ${targetSets}
-        ${completedSets >= targetSets ? ' · Możesz dodać ekstra' : ''}
-      </div>
+      <div class="text-sm text-muted text-center">Seria ${completedSets + 1} / ${targetSets}</div>
     `;
   },
 
@@ -262,9 +245,7 @@ const Workout = {
     }
 
     document.getElementById('btn-save-set')?.addEventListener('click', () => this.saveSet());
-    document.getElementById('btn-skip-set')?.addEventListener('click', () => {
-      Utils.toast('Pominięto serię');
-    });
+    document.getElementById('btn-skip-set')?.addEventListener('click', () => Utils.toast('Pominięto serię'));
     document.getElementById('btn-add-set')?.addEventListener('click', () => {
       const ex = this.active.exercises[this.active._currentEx ?? 0];
       if (ex) { ex.plannedSets = (ex.plannedSets || 3) + 1; App.refresh(); }
@@ -275,17 +256,14 @@ const Workout = {
     const exIdx = this.active._currentEx ?? 0;
     const ex = this.active.exercises[exIdx];
     if (!ex) return;
-
     const weight = Number(document.getElementById('set-weight')?.value);
     const reps = Number(document.getElementById('set-reps')?.value);
     if (!weight && weight !== 0) { Utils.toast('Podaj ciężar'); return; }
     if (!reps || reps < 1) { Utils.toast('Podaj powtórzenia'); return; }
-    if (weight < 0 || reps < 0) { Utils.toast('Wartości nie mogą być ujemne'); return; }
 
     const settings = Storage.getSettings();
     const set = {
-      weight,
-      reps,
+      weight, reps,
       rir: settings.mode === 'beginner' ? null : (Number(document.getElementById('set-rir')?.value) ?? null),
       rpe: Number(document.getElementById('set-rpe')?.value) || null,
       rip: Number(document.getElementById('set-rip')?.value) || null,
@@ -293,20 +271,14 @@ const Workout = {
       note: '',
       timestamp: new Date().toISOString()
     };
-
     if (set.rir != null && set.rpe == null) set.rpe = Utils.rirToRpe(set.rir);
-
     ex.sets.push(set);
 
     const prs = Storage.getPersonalRecords();
     const prev = prs[ex.exerciseId];
-    if (!prev || weight > prev.maxWeight) {
-      Utils.toast('🏆 NOWY REKORD — największy ciężar!', 'record');
-    } else if (weight * reps > (prev?.maxTonnage || 0)) {
-      Utils.toast('🏆 NOWY REKORD — tonnage!', 'record');
-    } else {
-      Utils.toast('Seria zapisana ✓', 'success');
-    }
+    if (!prev || weight > prev.maxWeight) Utils.toast('🏆 NOWY REKORD — największy ciężar!', 'record');
+    else if (weight * reps > (prev?.maxTonnage || 0)) Utils.toast('🏆 NOWY REKORD — tonnage!', 'record');
+    else Utils.toast('Seria zapisana ✓', 'success');
 
     const rest = ex.rest || Storage.getSettings().restDefault || 90;
     this.startRest(rest);
@@ -326,20 +298,14 @@ const Workout = {
         <button class="btn btn-secondary" id="rest-minus">−30s</button>
         <button class="btn btn-primary" id="rest-skip">Pomiń</button>
         <button class="btn btn-secondary" id="rest-plus">+30s</button>
-      </div>
-    `;
+      </div>`;
     document.body.appendChild(overlay);
-
     this.restTimer = setInterval(() => {
       this.restSeconds--;
       const el = document.getElementById('rest-display');
       if (el) el.textContent = Utils.formatTime(Math.max(0, this.restSeconds));
-      if (this.restSeconds <= 0) {
-        this.endRest();
-        Utils.toast('Koniec przerwy — czas na serię!');
-      }
+      if (this.restSeconds <= 0) { this.endRest(); Utils.toast('Koniec przerwy — czas na serię!'); }
     }, 1000);
-
     document.getElementById('rest-skip')?.addEventListener('click', () => this.endRest());
     document.getElementById('rest-plus')?.addEventListener('click', () => { this.restSeconds += 30; });
     document.getElementById('rest-minus')?.addEventListener('click', () => { this.restSeconds = Math.max(0, this.restSeconds - 30); });
@@ -357,34 +323,24 @@ const Workout = {
         <div class="modal-title">Dodaj ćwiczenie</div>
         <button class="modal-close" onclick="Utils.closeModal()">×</button>
       </div>
-      <input class="search-input mb-16" id="live-ex-search" placeholder="Szukaj...">
       <div id="live-ex-list" style="max-height:50vh;overflow-y:auto">
-        ${all.slice(0, 30).map(ex => `
+        ${all.slice(0, 40).map(ex => `
           <div class="exercise-item live-add-ex" data-id="${ex.id}">
             <div class="ex-thumb">${ex.icon || '🏋️'}</div>
             <div class="ex-info">
               <div class="ex-name">${ex.name}</div>
               <div class="ex-meta"><span class="ex-badge">${Utils.muscleShort(ex.musclePrimary)}</span></div>
             </div>
-          </div>
-        `).join('')}
-      </div>
-    `);
+          </div>`).join('')}
+      </div>`;
     document.querySelectorAll('.live-add-ex').forEach(item => {
       item.addEventListener('click', () => {
         const ex = Utils.getExerciseById(item.dataset.id);
         if (!ex) return;
         this.active.exercises.push({
-          exerciseId: ex.id,
-          name: ex.name,
-          musclePrimary: ex.musclePrimary,
-          muscleSecondary: ex.muscleSecondary || [],
-          plannedSets: 3,
-          plannedReps: '8-12',
-          plannedRir: 2,
-          rest: 90,
-          sets: [],
-          currentSet: 0
+          exerciseId: ex.id, name: ex.name, musclePrimary: ex.musclePrimary,
+          muscleSecondary: ex.muscleSecondary || [], plannedSets: 3, plannedReps: '8-12',
+          plannedRir: 2, rest: 90, sets: [], currentSet: 0
         });
         this.active._currentEx = this.active.exercises.length - 1;
         Utils.closeModal();
@@ -404,10 +360,8 @@ const Workout = {
           <label>${label} (1-5)</label>
           <input type="range" class="rir-slider" id="feel-${i}" min="1" max="5" value="3">
           <div class="text-center font-bold" id="feel-val-${i}">3</div>
-        </div>
-      `).join('')}
-      <button class="btn btn-primary btn-block mt-16" id="save-feeling">Zapisz</button>
-    `);
+        </div>`).join('')}
+      <button class="btn btn-primary btn-block mt-16" id="save-feeling">Zapisz</button>`;
     for (let i = 0; i < 5; i++) {
       document.getElementById(`feel-${i}`)?.addEventListener('input', e => {
         document.getElementById(`feel-val-${i}`).textContent = e.target.value;
@@ -439,14 +393,12 @@ const Workout = {
       App.navigate('dashboard');
       return;
     }
-
-    let tonnage = 0, totalSets = 0, totalReps = 0;
+    let tonnage = 0, totalSets = 0;
     this.active.exercises.forEach(ex => {
       ex.sets.forEach(s => {
         if (s.type === 'warmup') return;
         tonnage += (s.weight || 0) * (s.reps || 0);
         totalSets++;
-        totalReps += s.reps || 0;
       });
     });
     this.active.tonnage = tonnage;
@@ -455,7 +407,7 @@ const Workout = {
     const muscleEng = {};
     this.active.exercises.forEach(ex => {
       const add = (m, factor) => {
-        if (!muscleEng[m]) muscleEng[m] = { sets: 0, tonnage: 0 };
+        if (!muscleEng[m]) muscleEng[m] = { sets: 0 };
         muscleEng[m].sets += factor;
       };
       ex.sets.filter(s => s.type !== 'warmup').forEach(() => {
@@ -477,16 +429,10 @@ const Workout = {
       <div class="card mt-16">
         <div class="card-title">Zaangażowanie mięśni</div>
         ${Object.entries(muscleEng).map(([m, v]) => `
-          <div class="flex-between text-sm mb-8">
-            <span>${Utils.muscleShort(m)}</span>
-            <span>${Math.round(v.sets)} serii</span>
-          </div>
-        `).join('')}
+          <div class="flex-between text-sm mb-8"><span>${Utils.muscleShort(m)}</span><span>${Math.round(v.sets)} serii</span></div>`).join('')}
       </div>
-      <p class="text-xs text-muted mt-8">Dane wykorzystane do analizy regeneracji i progresu.</p>
       <button class="btn btn-primary btn-block mt-16" id="confirm-finish">Zapisz trening</button>
-      <button class="btn btn-ghost btn-block mt-8" id="btn-feeling-after">Oceń samopoczucie po</button>
-    `);
+      <button class="btn btn-ghost btn-block mt-8" id="btn-feeling-after">Oceń samopoczucie po</button>`;
 
     document.getElementById('confirm-finish')?.addEventListener('click', () => {
       Storage.addWorkout(this.active);
@@ -500,3 +446,4 @@ const Workout = {
     document.getElementById('btn-feeling-after')?.addEventListener('click', () => this.showFeelingModal('after'));
   }
 };
+// v=2
