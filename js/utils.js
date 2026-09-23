@@ -184,12 +184,14 @@ const Utils = {
   },
 
   muscleName(id) {
-    const m = MUSCLE_GROUPS.find(x => x.id === id);
+    if (typeof MuscleTree !== 'undefined') return MuscleTree.label(id);
+    const m = (typeof MUSCLE_GROUPS !== 'undefined' ? MUSCLE_GROUPS : []).find(x => x.id === id);
     return m ? m.name : id;
   },
 
   muscleShort(id) {
-    const m = MUSCLE_GROUPS.find(x => x.id === id);
+    if (typeof MuscleTree !== 'undefined') return MuscleTree.short(id);
+    const m = (typeof MUSCLE_GROUPS !== 'undefined' ? MUSCLE_GROUPS : []).find(x => x.id === id);
     return m ? m.short : id;
   },
 
