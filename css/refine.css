@@ -44,7 +44,7 @@
   gap: 12px;
 }
 
-/* Muscle table (biblioteka schema) */
+/* Muscle table */
 .muscle-table { display: flex; flex-direction: column; gap: 10px; }
 .muscle-group {
   border: 1px solid var(--border);
@@ -59,10 +59,12 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.muscle-group-header.push { background: rgba(224, 84, 84, 0.12); color: #e07070; }
+.muscle-group-header.push,
+.muscle-group-header.upper { background: rgba(224, 84, 84, 0.12); color: #e07070; }
 .muscle-group-header.pull { background: rgba(91, 157, 255, 0.12); color: #7ab0ff; }
 .muscle-group-header.legs { background: rgba(201, 162, 39, 0.12); color: var(--primary); }
 .muscle-group-header.core { background: rgba(139, 126, 200, 0.12); color: #a89ad8; }
+.muscle-group-header.other { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
 .muscle-grid { display: grid; grid-template-columns: 1fr 1fr; }
 .muscle-item {
   display: flex;
@@ -114,56 +116,31 @@
   border-radius: 10px;
   background: #000;
 }
-.media-remove { margin-top: 8px; }
 
-.filter-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  margin-bottom: 12px;
-  overflow: hidden;
+/* Filter bar: partia + wyszukiwarka obok siebie */
+.ex-filter-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
 }
-.filter-toggle {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  text-align: left;
+@media (max-width: 420px) {
+  .ex-filter-bar { grid-template-columns: 1fr; }
 }
-.filter-toggle .chev { margin-left: auto; color: var(--text-muted); }
-.filter-badge {
-  background: var(--primary-dim);
-  color: var(--primary);
+.ex-filter-label {
+  display: block;
   font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-.filter-body { padding: 0 12px 14px; }
-.filter-body[hidden] { display: none !important; }
-
-.source-chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.ex-custom-tag {
-  font-size: 10px;
   font-weight: 600;
-  color: var(--primary);
-  background: var(--primary-dim);
-  padding: 1px 6px;
-  border-radius: 4px;
-  vertical-align: middle;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
 }
+.ex-filter-muscle .form-select,
+.ex-filter-search .search-input {
+  width: 100%;
+}
+
 .ex-thumb-img {
   width: 100%;
   height: 100%;
