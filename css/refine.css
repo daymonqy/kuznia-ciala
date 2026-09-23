@@ -136,6 +136,64 @@ body {
 .pex-item.selected { border-left: 3px solid var(--primary); }
 .pex-icon { font-size: 22px; width: 36px; text-align: center; }
 
+.plan-ex-order {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.order-btn {
+  width: 28px;
+  height: 24px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+}
+.order-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.order-btn:not(:disabled):hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.set-config-labels {
+  display: grid;
+  grid-template-columns: 28px 1fr 1.2fr 52px 52px 32px;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
+.set-config-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 1.2fr 52px 52px 32px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.set-config-num {
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.set-config-row .form-input,
+.set-config-row .form-select {
+  padding: 8px 6px;
+  font-size: 13px;
+  min-width: 0;
+}
+
 @media (min-width: 768px) {
   .content-area { max-width: 640px; }
   .modal-content { border-radius: var(--radius-lg); }
