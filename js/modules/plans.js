@@ -1,5 +1,4 @@
 const Plans = {
-  _pendingDay: null,
   _editPlanId: null,
 
   render() {
@@ -95,14 +94,37 @@ const Plans = {
     });
   },
 
+  normalizeSetDetails(ex) {
+    if (ex.setDetails && Array.isArray(ex.setDetails) && ex.setDetails.length) {
+      return ex.setDetails.map(s => ({
+        reps: s.reps != null ? String(s.reps) : '8-12',
+        type: s.type || 'working',
+        rir: s.rir != null && s.rir !== '' ? Number(s.rir) : null,
+        rip: s.rip != null && s.rip !== '' ? Number(s.rip) : null
+      }));
+    }
+    const n = Number(ex.sets) || 3;
+    const reps = ex.reps != null ? String(ex.reps) : '8-12';
+    const type = ex.setType || 'working';
+    const rir = ex.rir != null && ex.rir !== '' ? Number(ex.rir) : 2;
+    const rip = ex.rip != null && ex.rip !== '' ? Number(ex.rip) : null;
+    return Array.from({ length: n }, () => ({ reps, type, rir, rip }));
+  },
+
   formatExMeta(ex) {
-    const typeName = SET_TYPES.find(t => t.id === (ex.setType || 'working'))?.name || '';
-    const parts = [`${ex.sets}×${ex.reps}`];
-    if (ex.rir != null && ex.rir !== '') parts.push(`RIR ${ex.rir}`);
-    if (ex.rip != null && ex.rip !== '') parts.push(`RIP ${ex.rip}`);
-    if (typeName && ex.setType && ex.setType !== 'working') parts.push(typeName);
-    if (ex.rest) parts.push(`${ex.rest}s`);
-    return parts.join(' · ');
+    const details = this.normalizeSetDetails(ex);
+    const short = details.map((s, i) => {
+      const t = SET_TYPES.find(x => x.id === s.type);
+      const label = t && s.type !== 'working' ? t.name.slice(0, 3) : '';
+      const rir = s.rir != null ? ` RIR${s.rir}` : '';
+      return `${i + 1}:${s.reps}${label ? ' ' + label : ''}${rir}`;
+    });
+    const rest = ex.rest ? ` · ${ex.rest}s` : '';
+    return short.join(' · ') + rest;
+  },
+
+  savePlan(plan) {
+    Storage.savePlans(Storage.getPlans().map(p => p.id === plan.id ? plan : p));
   },
 
   showEdit(id) {
@@ -122,7 +144,13 @@ const Plans = {
           </div>
           ${(day.exercises || []).map((ex, ei) => {
             const e = Utils.getExerciseById(ex.exerciseId);
+            const canUp = ei > 0;
+            const canDown = ei < day.exercises.length - 1;
             return `<div class="plan-ex-row">
+              <div class="plan-ex-order">
+                <button type="button" class="order-btn move-ex-up" data-di="${di}" data-ei="${ei}" ${canUp ? '' : 'disabled'} title="W górę">↑</button>
+                <button type="button" class="order-btn move-ex-down" data-di="${di}" data-ei="${ei}" ${canDown ? '' : 'disabled'} title="W dół">↓</button>
+              </div>
               <div class="plan-ex-main">
                 <div class="font-bold text-sm">${e?.name || ex.exerciseId}</div>
                 <div class="text-xs text-muted">${this.formatExMeta(ex)}</div>
@@ -155,7 +183,31 @@ const Plans = {
         const di = Number(btn.dataset.di);
         const ei = Number(btn.dataset.ei);
         plan.days[di].exercises.splice(ei, 1);
-        Storage.savePlans(Storage.getPlans().map(p => p.id === id ? plan : p));
+        this.savePlan(plan);
+        this.showEdit(id);
+      });
+    });
+
+    document.querySelectorAll('.move-ex-up').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const di = Number(btn.dataset.di);
+        const ei = Number(btn.dataset.ei);
+        if (ei <= 0) return;
+        const arr = plan.days[di].exercises;
+        [arr[ei - 1], arr[ei]] = [arr[ei], arr[ei - 1]];
+        this.savePlan(plan);
+        this.showEdit(id);
+      });
+    });
+
+    document.querySelectorAll('.move-ex-down').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const di = Number(btn.dataset.di);
+        const ei = Number(btn.dataset.ei);
+        const arr = plan.days[di].exercises;
+        if (ei >= arr.length - 1) return;
+        [arr[ei], arr[ei + 1]] = [arr[ei + 1], arr[ei]];
+        this.savePlan(plan);
         this.showEdit(id);
       });
     });
@@ -164,7 +216,7 @@ const Plans = {
       document.querySelectorAll('.day-name').forEach(inp => {
         plan.days[Number(inp.dataset.di)].name = inp.value;
       });
-      Storage.savePlans(Storage.getPlans().map(p => p.id === id ? plan : p));
+      this.savePlan(plan);
       Utils.closeModal();
       App.refresh();
       Utils.toast('Zapisano');
@@ -179,10 +231,38 @@ const Plans = {
     });
   },
 
+  defaultSetRow() {
+    return { reps: '8-12', type: 'working', rir: 2, rip: '' };
+  },
+
   showAddExerciseModal(planId, dayIndex, existing = null, editIndex = null) {
     const allEx = Utils.allExercises();
     const isEdit = !!existing;
     const selectedId = existing?.exerciseId || '';
+    let setRows = existing
+      ? this.normalizeSetDetails(existing).map(s => ({
+          reps: s.reps,
+          type: s.type,
+          rir: s.rir != null ? s.rir : '',
+          rip: s.rip != null ? s.rip : ''
+        }))
+      : [this.defaultSetRow(), this.defaultSetRow(), this.defaultSetRow()];
+
+    const restVal = existing?.rest ?? 120;
+
+    const typeOptions = (selected) =>
+      SET_TYPES.map(t => `<option value="${t.id}" ${selected === t.id ? 'selected' : ''}>${t.name}</option>`).join('');
+
+    const renderSetRowsHtml = () => setRows.map((s, i) => `
+      <div class="set-config-row" data-si="${i}">
+        <div class="set-config-num">${i + 1}</div>
+        <input class="form-input set-cfg-reps" data-si="${i}" value="${s.reps}" placeholder="powt." title="Powtórzenia">
+        <select class="form-select set-cfg-type" data-si="${i}" title="Typ serii">${typeOptions(s.type)}</select>
+        <input class="form-input set-cfg-rir" data-si="${i}" type="number" min="0" max="5" value="${s.rir}" placeholder="RIR" title="RIR">
+        <input class="form-input set-cfg-rip" data-si="${i}" type="number" min="1" max="5" value="${s.rip}" placeholder="RIP" title="RIP">
+        <button type="button" class="btn btn-ghost set-cfg-remove" data-si="${i}" style="color:var(--danger);padding:6px 8px" ${setRows.length <= 1 ? 'disabled' : ''}>×</button>
+      </div>
+    `).join('');
 
     Utils.showModal(`
       <div class="modal-header">
@@ -204,38 +284,18 @@ const Plans = {
       <input type="hidden" id="pex-id" value="${selectedId}">
       `}
 
-      <div class="form-row-2">
-        <div class="form-group">
-          <label>Serie</label>
-          <input class="form-input" type="number" id="pex-sets" min="1" max="20" value="${existing?.sets ?? 3}">
+      <div class="form-group">
+        <label>Serie (każda osobno)</label>
+        <div class="set-config-labels">
+          <span>#</span><span>Powt.</span><span>Typ</span><span>RIR</span><span>RIP</span><span></span>
         </div>
-        <div class="form-group">
-          <label>Powtórzenia</label>
-          <input class="form-input" id="pex-reps" placeholder="8-12" value="${existing?.reps ?? '8-12'}">
-        </div>
-      </div>
-
-      <div class="form-row-2">
-        <div class="form-group">
-          <label>RIR</label>
-          <input class="form-input" type="number" id="pex-rir" min="0" max="5" step="1" value="${existing?.rir ?? 2}" placeholder="0–5">
-        </div>
-        <div class="form-group">
-          <label>RIP (1–5)</label>
-          <input class="form-input" type="number" id="pex-rip" min="1" max="5" step="1" value="${existing?.rip ?? ''}" placeholder="opc.">
-        </div>
+        <div id="set-config-list">${renderSetRowsHtml()}</div>
+        <button type="button" class="btn btn-secondary btn-block mt-8" id="add-set-row" style="padding:10px;font-size:13px">+ Dodaj serię</button>
       </div>
 
       <div class="form-group">
-        <label>Typ serii</label>
-        <select class="form-select" id="pex-type">
-          ${SET_TYPES.map(t => `<option value="${t.id}" ${(existing?.setType || 'working') === t.id ? 'selected' : ''}>${t.name}</option>`).join('')}
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Przerwa (sekundy)</label>
-        <input class="form-input" type="number" id="pex-rest" min="0" max="600" value="${existing?.rest ?? 120}">
+        <label>Przerwa między seriami (sekundy)</label>
+        <input class="form-input" type="number" id="pex-rest" min="0" max="600" value="${restVal}">
       </div>
 
       <button class="btn btn-primary btn-block mt-16" id="pex-confirm" ${!isEdit ? 'disabled' : ''}>
@@ -243,6 +303,41 @@ const Plans = {
       </button>
       <button class="btn btn-ghost btn-block mt-8" id="pex-back">Wróć do planu</button>
     `);
+
+    const syncRowsFromDom = () => {
+      document.querySelectorAll('.set-config-row').forEach(row => {
+        const i = Number(row.dataset.si);
+        if (!setRows[i]) return;
+        setRows[i].reps = row.querySelector('.set-cfg-reps')?.value.trim() || '8-12';
+        setRows[i].type = row.querySelector('.set-cfg-type')?.value || 'working';
+        setRows[i].rir = row.querySelector('.set-cfg-rir')?.value ?? '';
+        setRows[i].rip = row.querySelector('.set-cfg-rip')?.value ?? '';
+      });
+    };
+
+    const refreshSetRows = () => {
+      const el = document.getElementById('set-config-list');
+      if (!el) return;
+      el.innerHTML = renderSetRowsHtml();
+      el.querySelectorAll('.set-cfg-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          syncRowsFromDom();
+          const i = Number(btn.dataset.si);
+          if (setRows.length <= 1) return;
+          setRows.splice(i, 1);
+          refreshSetRows();
+        });
+      });
+    };
+
+    refreshSetRows();
+
+    document.getElementById('add-set-row')?.addEventListener('click', () => {
+      syncRowsFromDom();
+      const last = setRows[setRows.length - 1] || this.defaultSetRow();
+      setRows.push({ ...last });
+      refreshSetRows();
+    });
 
     const renderList = () => {
       const q = (document.getElementById('pex-search')?.value || '').toLowerCase().trim();
@@ -281,21 +376,25 @@ const Plans = {
     document.getElementById('pex-confirm')?.addEventListener('click', () => {
       const exerciseId = document.getElementById('pex-id').value;
       if (!exerciseId) { Utils.toast('Wybierz ćwiczenie'); return; }
-      const sets = Number(document.getElementById('pex-sets').value) || 3;
-      const reps = document.getElementById('pex-reps').value.trim() || '8-12';
-      const rirVal = document.getElementById('pex-rir').value;
-      const ripVal = document.getElementById('pex-rip').value;
-      const setType = document.getElementById('pex-type').value || 'working';
-      const rest = Number(document.getElementById('pex-rest').value) || 120;
+      syncRowsFromDom();
+      if (!setRows.length) { Utils.toast('Dodaj co najmniej jedną serię'); return; }
+
+      const setDetails = setRows.map(s => ({
+        reps: s.reps || '8-12',
+        type: s.type || 'working',
+        rir: s.rir === '' || s.rir == null ? null : Number(s.rir),
+        rip: s.rip === '' || s.rip == null ? null : Number(s.rip)
+      }));
 
       const entry = {
         exerciseId,
-        sets,
-        reps,
-        rir: rirVal === '' ? null : Number(rirVal),
-        rip: ripVal === '' ? null : Number(ripVal),
-        setType,
-        rest
+        sets: setDetails.length,
+        reps: setDetails[0]?.reps || '8-12',
+        rir: setDetails.find(s => s.rir != null)?.rir ?? null,
+        rip: setDetails.find(s => s.rip != null)?.rip ?? null,
+        setType: setDetails[0]?.type || 'working',
+        setDetails,
+        rest: Number(document.getElementById('pex-rest').value) || 120
       };
 
       const plans = Storage.getPlans();
