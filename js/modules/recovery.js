@@ -1,12 +1,27 @@
 const Recovery = {
+  /** Główne partie do siatki regeneracji (korzenie drzewa istotne treningowo). */
+  mainGroups() {
+    const ids = [
+      'klatka', 'plecy', 'barki', 'biceps', 'triceps', 'przedramiona',
+      'brzuch', 'posladki', 'czworoglowe', 'dwuglowe', 'przywodziciele',
+      'odwodziciele', 'lydki', 'szyja'
+    ];
+    return ids.map(id => ({
+      id,
+      name: (typeof MuscleTree !== 'undefined' ? MuscleTree.label(id) : id),
+      short: (typeof MuscleTree !== 'undefined' ? MuscleTree.short(id) : id)
+    }));
+  },
+
   render() {
     const workouts = Storage.getWorkouts();
+    const groups = this.mainGroups();
     return `
       <div class="section-title">Regeneracja</div>
       <p class="text-sm text-secondary mb-16">Szacowany status regeneracji na podstawie danych treningowych. To orientacyjna metryka, nie pomiar medyczny.</p>
 
       <div class="muscle-grid">
-        ${MUSCLE_GROUPS.filter(m => m.id !== 'core' && m.id !== 'przedramiona').map(m => {
+        ${groups.map(m => {
           const pct = Utils.estimateRecovery(m.id, workouts);
           const vol = Utils.getMuscleVolume(m.id, workouts, 7);
           return `
@@ -27,7 +42,7 @@ const Recovery = {
         <div class="card-title">Czy mogę dziś trenować?</div>
         <p class="text-sm text-secondary mb-12">Wybierz partię — pokażemy dane pomocnicze. Decyzja należy do Ciebie.</p>
         <div class="chip-group">
-          ${MUSCLE_GROUPS.slice(0, 8).map(m => `
+          ${groups.slice(0, 8).map(m => `
             <div class="chip check-muscle" data-m="${m.id}">${m.short}</div>
           `).join('')}
         </div>
