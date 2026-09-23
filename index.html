@@ -4,11 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Kuźnia Ciała — Dziennik Treningowy</title>
-  <link rel="stylesheet" href="css/styles.css?v=2">
-  <link rel="stylesheet" href="css/refine.css?v=2">
+  <link rel="stylesheet" href="css/styles.css?v=3">
+  <link rel="stylesheet" href="css/refine.css?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    #auth-screen { overflow-y: auto; background: var(--bg); }
+    .auth-wrap { max-width: 420px; margin: 0 auto; padding: 40px 20px 48px; width: 100%; }
+    .auth-logo { text-align: center; margin-bottom: 28px; }
+    .auth-logo h1 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--primary), var(--accent, #22c55e));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .auth-logo p { color: var(--text-secondary); margin-top: 8px; font-size: 14px; }
+    .auth-tabs {
+      display: flex; gap: 4px; background: var(--bg-card); padding: 4px;
+      border-radius: 12px; margin-bottom: 20px;
+    }
+    .auth-tabs .tab {
+      flex: 1; padding: 12px; text-align: center; border-radius: 10px;
+      font-size: 14px; font-weight: 600; background: transparent; border: none;
+      color: var(--text-secondary); cursor: pointer;
+    }
+    .auth-tabs .tab.active { background: var(--bg-elevated); color: var(--text); }
+    .auth-message {
+      display: none; padding: 12px 14px; border-radius: 12px; margin-bottom: 16px;
+      font-size: 14px; font-weight: 500;
+    }
+    .auth-message.error { display: block; background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+    .auth-message.success { display: block; background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+    .auth-message.info { display: block; background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(91,157,255,0.25); }
+    .auth-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 22px;
+    }
+  </style>
 </head>
 <body>
   <div id="app">
@@ -20,14 +52,53 @@
       </div>
     </div>
 
-    <div id="onboarding-screen" class="screen">
-      <div class="onboarding-container">
-        <div class="onboarding-progress">
-          <div class="progress-bar" id="onb-progress"></div>
+    <div id="auth-screen" class="screen">
+      <div class="auth-wrap">
+        <div class="auth-logo">
+          <h1>Kuźnia Ciała</h1>
+          <p>Zaloguj się, aby zapisywać treningi na koncie</p>
         </div>
-        <div id="onboarding-steps"></div>
+        <div class="auth-tabs" id="auth-tabs">
+          <button type="button" class="tab active" id="tab-login">Logowanie</button>
+          <button type="button" class="tab" id="tab-register">Rejestracja</button>
+        </div>
+        <div id="auth-message" class="auth-message"></div>
+        <div class="auth-card">
+          <div id="form-login">
+            <div class="form-group">
+              <label>E-mail</label>
+              <input class="form-input" type="email" id="login-email" autocomplete="email" placeholder="ty@email.com">
+            </div>
+            <div class="form-group">
+              <label>Hasło</label>
+              <input class="form-input" type="password" id="login-password" autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <button type="button" class="btn btn-primary btn-block btn-lg" id="btn-do-login">Zaloguj się</button>
+          </div>
+          <div id="form-register" class="hidden">
+            <div class="form-group">
+              <label>Imię / pseudonim</label>
+              <input class="form-input" type="text" id="reg-name" autocomplete="name" placeholder="Jan">
+            </div>
+            <div class="form-group">
+              <label>E-mail</label>
+              <input class="form-input" type="email" id="reg-email" autocomplete="email" placeholder="ty@email.com">
+            </div>
+            <div class="form-group">
+              <label>Hasło</label>
+              <input class="form-input" type="password" id="reg-password" autocomplete="new-password" placeholder="min. 6 znaków">
+            </div>
+            <div class="form-group">
+              <label>Powtórz hasło</label>
+              <input class="form-input" type="password" id="reg-password2" autocomplete="new-password" placeholder="••••••••">
+            </div>
+            <button type="button" class="btn btn-primary btn-block btn-lg" id="btn-do-register">Utwórz konto</button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <div id="onboarding-screen" class="screen"></div>
 
     <div id="main-app" class="screen">
       <header class="app-header">
@@ -46,9 +117,7 @@
           </button>
         </div>
       </header>
-
       <main id="content" class="content-area"></main>
-
       <nav class="bottom-nav" id="bottom-nav">
         <button class="nav-item active" data-view="dashboard">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -78,14 +147,18 @@
     <div id="modal-overlay" class="modal-overlay">
       <div id="modal-content" class="modal-content"></div>
     </div>
-
     <div id="toast" class="toast"></div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
   <script src="data/exercises.js"></script>
-  <script src="js/storage.js"></script>
+  <script src="js/storage.js?v=3"></script>
   <script src="js/utils.js"></script>
-  <script src="js/modules/profile.js"></script>
+  <script src="js/auth-app.js?v=3"></script>
+  <script src="js/modules/profile.js?v=3"></script>
   <script src="js/modules/dashboard.js"></script>
   <script src="js/modules/exercises.js"></script>
   <script src="js/modules/plans.js?v=2"></script>
@@ -95,6 +168,6 @@
   <script src="js/modules/calculator.js"></script>
   <script src="js/modules/progress.js"></script>
   <script src="js/modules/settings.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>
