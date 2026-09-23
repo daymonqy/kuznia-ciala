@@ -1,6 +1,6 @@
 const Exercises = {
   search: '',
-  filterMuscles: [],
+  filterMuscle: 'all',
   filterEquip: 'all',
   filterSource: 'all',
   filterCollapsed: true,
@@ -9,35 +9,42 @@ const Exercises = {
 
   MUSCLE_TABLE: [
     {
-      key: 'push', label: 'Push',
+      key: 'upper', label: 'Góra ciała',
       items: [
         { id: 'klatka', name: 'Klatka piersiowa', icon: '❤️' },
-        { id: 'barki', name: 'Barki', icon: '⬆️' },
-        { id: 'triceps', name: 'Triceps', icon: '💪' }
-      ]
-    },
-    {
-      key: 'pull', label: 'Pull',
-      items: [
         { id: 'plecy', name: 'Plecy', icon: '🔙' },
+        { id: 'barki', name: 'Barki', icon: '⬆️' },
         { id: 'biceps', name: 'Biceps', icon: '💪' },
-        { id: 'przedramiona', name: 'Przedramiona', icon: '✊' }
-      ]
-    },
-    {
-      key: 'legs', label: 'Nogi',
-      items: [
-        { id: 'czworoglowe', name: 'Czworogłowy uda', icon: '🦵' },
-        { id: 'dwuglowe', name: 'Kulszowo-goleniowe', icon: '🏃' },
-        { id: 'posladki', name: 'Biodra / pośladki', icon: '↔️' },
-        { id: 'lydki', name: 'Łydki', icon: '👟' }
+        { id: 'triceps', name: 'Triceps', icon: '💪' },
+        { id: 'przedramiona', name: 'Przedramiona', icon: '✊' },
+        { id: 'kaptury', name: 'Czworoboczne (kaptury)', icon: '🏔️' },
+        { id: 'prostowniki', name: 'Prostowniki grzbietu', icon: '📐' },
+        { id: 'szyja', name: 'Szyja', icon: '🦒' }
       ]
     },
     {
       key: 'core', label: 'Korpus',
       items: [
-        { id: 'brzuch', name: 'Mięśnie brzucha', icon: '⭕' },
-        { id: 'core', name: 'Core', icon: '🎯' }
+        { id: 'brzuch', name: 'Brzuch', icon: '⭕' }
+      ]
+    },
+    {
+      key: 'legs', label: 'Nogi',
+      items: [
+        { id: 'posladki', name: 'Pośladki', icon: '🍑' },
+        { id: 'czworoglowe', name: 'Czworogłowe uda', icon: '🦵' },
+        { id: 'dwuglowe', name: 'Dwugłowe uda', icon: '🏃' },
+        { id: 'przywodziciele', name: 'Przywodziciele ud', icon: '➡️' },
+        { id: 'odwodziciele', name: 'Odwodziciele ud', icon: '⬅️' },
+        { id: 'lydki', name: 'Łydki', icon: '👟' },
+        { id: 'piszczelowe', name: 'Mięśnie piszczelowe', icon: '🦴' }
+      ]
+    },
+    {
+      key: 'other', label: 'Pozostałe',
+      items: [
+        { id: 'cale-cialo', name: 'Całe ciało', icon: '🧍' },
+        { id: 'inne', name: 'Inne', icon: '➕' }
       ]
     }
   ],
@@ -46,33 +53,26 @@ const Exercises = {
 
   render() {
     const list = this.getFiltered();
+    const muscleOpts = MUSCLE_GROUPS.map(g =>
+      `<option value="${g.id}" ${this.filterMuscle===g.id?'selected':''}>${g.name}</option>`
+    ).join('');
     return `
       <div class="flex-between mb-16">
         <div class="section-title" style="margin:0">Ćwiczenia</div>
         <button class="btn btn-primary" id="btn-add-exercise" style="padding:10px 14px;font-size:13px">+ Utwórz</button>
       </div>
 
-      <div class="search-bar">
-        <input class="search-input" id="ex-search" placeholder="Szukaj ćwiczenia..." value="${this.search.replace(/"/g, '&quot;')}">
-      </div>
-
-      <div class="source-chips mb-12">
-        ${[['all','Wszystkie'],['custom','Moje'],['base','Baza']].map(([id,label]) => `
-          <button type="button" class="filter-chip ${this.filterSource===id?'active':''}" data-source="${id}">${label}</button>
-        `).join('')}
-      </div>
-
-      <div class="filter-panel ${this.filterCollapsed ? 'collapsed' : ''}" id="ex-filter-panel">
-        <button type="button" class="filter-toggle" id="ex-filter-toggle">
-          Partie mięśniowe
-          <span class="chev">${this.filterCollapsed ? '▾' : '▴'}</span>
-          ${this.filterMuscles.length ? `<span class="filter-badge">${this.filterMuscles.length}</span>` : ''}
-        </button>
-        <div class="filter-body" ${this.filterCollapsed ? 'hidden' : ''}>
-          ${this.renderMuscleTable(this.filterMuscles, 'filter')}
-          <div class="flex gap-8 mt-12">
-            <button type="button" class="btn btn-ghost" id="ex-filter-clear" style="flex:1;padding:10px">Wyczyść</button>
-          </div>
+      <div class="ex-filter-bar">
+        <div class="ex-filter-muscle">
+          <label class="ex-filter-label">Partia mięśniowa</label>
+          <select class="form-select" id="ex-muscle-filter">
+            <option value="all" ${this.filterMuscle==='all'?'selected':''}>Wszystkie partie</option>
+            ${muscleOpts}
+          </select>
+        </div>
+        <div class="ex-filter-search">
+          <label class="ex-filter-label">Szukaj</label>
+          <input class="search-input" id="ex-search" placeholder="Nazwa ćwiczenia..." value="${this.search.replace(/"/g, '"')}">
         </div>
       </div>
 
@@ -83,14 +83,13 @@ const Exercises = {
         ).join('')}
       </div>
 
-      <div class="text-sm text-muted mb-8">${list.length} ćwiczeń</div>
+      <div class="text-sm text-muted mb-8">${list.length} ćwiczeń w bazie</div>
 
       ${list.length === 0 ? `
         <div class="empty-state">
           <div class="empty-icon">🔍</div>
           <h3>Brak wyników</h3>
-          <p>Zmień filtry lub utwórz własne ćwiczenie.</p>
-          <button class="btn btn-primary" id="btn-add-exercise-empty">Utwórz ćwiczenie</button>
+          <p>Zmień partię lub frazę wyszukiwania.</p>
         </div>
       ` : list.map(ex => {
         const thumb = ex.media?.dataUrl && ex.media.type === 'image'
@@ -100,7 +99,7 @@ const Exercises = {
         <div class="exercise-item" data-id="${ex.id}">
           <div class="ex-thumb">${thumb}</div>
           <div class="ex-info">
-            <div class="ex-name">${ex.name}${ex.custom ? ' <span class="ex-custom-tag">własne</span>' : ''}</div>
+            <div class="ex-name">${ex.name}</div>
             <div class="ex-meta">
               <span class="ex-badge">${Utils.muscleShort(ex.musclePrimary)}</span>
               ${(ex.muscleSecondary || []).slice(0, 2).map(m =>
@@ -137,23 +136,31 @@ const Exercises = {
   },
 
   getFiltered() {
-    let list = Utils.allExercises();
-    if (this.filterSource === 'custom') list = list.filter(e => e.custom);
-    if (this.filterSource === 'base') list = list.filter(e => !e.custom);
+    let list = (typeof EXERCISE_DB !== 'undefined' ? EXERCISE_DB : []).slice();
+
     if (this.search) {
-      const q = this.search.toLowerCase();
+      const q = this.search.toLowerCase().trim();
       list = list.filter(e =>
         e.name.toLowerCase().includes(q) ||
-        (e.nameEn || '').toLowerCase().includes(q) ||
-        (e.muscles || []).some(m => String(m).toLowerCase().includes(q))
+        (e.nameEn || '').toLowerCase().includes(q)
       );
     }
-    if (this.filterMuscles.length) {
+
+    if (this.filterMuscle && this.filterMuscle !== 'all') {
+      const m = this.filterMuscle;
       list = list.filter(e => {
         const all = [e.musclePrimary, ...(e.muscleSecondary || []), ...(e.muscles || [])];
-        return this.filterMuscles.some(m => all.includes(m));
+        if (m === 'cale-cialo') {
+          return all.includes('cale-cialo') || (e.muscleSecondary || []).length >= 3;
+        }
+        if (m === 'inne') {
+          const known = new Set(MUSCLE_GROUPS.map(g => g.id).filter(id => id !== 'inne' && id !== 'cale-cialo'));
+          return e.musclePrimary === 'inne' || !known.has(e.musclePrimary);
+        }
+        return all.includes(m);
       });
     }
+
     if (this.filterEquip !== 'all') {
       list = list.filter(e => (e.equipment || []).includes(this.filterEquip));
     }
@@ -165,30 +172,9 @@ const Exercises = {
       this.search = e.target.value;
       App.refresh();
     });
-    document.querySelectorAll('[data-source]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.filterSource = btn.dataset.source;
-        App.refresh();
-      });
-    });
-    document.getElementById('ex-filter-toggle')?.addEventListener('click', () => {
-      this.filterCollapsed = !this.filterCollapsed;
+    document.getElementById('ex-muscle-filter')?.addEventListener('change', e => {
+      this.filterMuscle = e.target.value;
       App.refresh();
-    });
-    document.getElementById('ex-filter-clear')?.addEventListener('click', () => {
-      this.filterMuscles = [];
-      App.refresh();
-    });
-    document.querySelectorAll('input[data-mode="filter"]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const id = cb.dataset.muscle;
-        if (cb.checked) {
-          if (!this.filterMuscles.includes(id)) this.filterMuscles.push(id);
-        } else {
-          this.filterMuscles = this.filterMuscles.filter(m => m !== id);
-        }
-        App.refresh();
-      });
     });
     document.querySelectorAll('#equip-filters .filter-chip').forEach(c => {
       c.addEventListener('click', () => {
@@ -200,11 +186,10 @@ const Exercises = {
       item.addEventListener('click', () => this.showDetail(item.dataset.id));
     });
     document.getElementById('btn-add-exercise')?.addEventListener('click', () => this.showCreateForm());
-    document.getElementById('btn-add-exercise-empty')?.addEventListener('click', () => this.showCreateForm());
   },
 
   showDetail(id) {
-    const ex = Utils.getExerciseById(id);
+    const ex = Utils.getExerciseById(id) || (EXERCISE_DB || []).find(e => e.id === id);
     if (!ex) return;
     const history = Storage.getExerciseHistory(id);
     const last = history[0];
@@ -228,7 +213,6 @@ const Exercises = {
         ).join('')}
       </div>
       <p class="text-sm text-secondary mb-16">${ex.description || ex.instructions || ''}</p>
-
       <div class="card" style="padding:14px">
         <div class="card-title">Ostatnie wyniki</div>
         ${lastSets.length ? lastSets.map(s => `
@@ -238,26 +222,8 @@ const Exercises = {
           </div>
         `).join('') : '<p class="text-sm text-muted">Brak historii</p>'}
       </div>
-
       <div class="text-xs text-muted mt-8">Sprzęt: ${(ex.equipment || []).join(', ') || '–'} · ${ex.difficulty || ''}</div>
-
-      ${ex.custom ? `
-        <button class="btn btn-secondary btn-block mt-16" id="btn-edit-ex">Edytuj</button>
-        <button class="btn btn-ghost btn-block mt-8" id="btn-delete-ex" style="color:var(--danger)">Usuń własne ćwiczenie</button>
-      ` : ''}
     `);
-
-    document.getElementById('btn-edit-ex')?.addEventListener('click', () => {
-      Utils.closeModal();
-      this.showCreateForm(ex);
-    });
-    document.getElementById('btn-delete-ex')?.addEventListener('click', () => {
-      if (!Utils.confirm('Usunąć to ćwiczenie?')) return;
-      Storage.saveCustomExercises(Storage.getCustomExercises().filter(e => e.id !== id));
-      Utils.closeModal();
-      App.refresh();
-      Utils.toast('Usunięto');
-    });
   },
 
   showCreateForm(existing = null) {
@@ -282,18 +248,15 @@ const Exercises = {
         <div class="modal-title">${isEdit ? 'Edytuj ćwiczenie' : 'Nowe ćwiczenie'}</div>
         <button class="modal-close" onclick="Utils.closeModal()">×</button>
       </div>
-
       <div class="form-group">
         <label>Nazwa</label>
-        <input class="form-input" id="cex-name" placeholder="np. Przysiad bułgarski" value="${(existing?.name || '').replace(/"/g, '&quot;')}">
+        <input class="form-input" id="cex-name" placeholder="np. Przysiad bułgarski" value="${(existing?.name || '').replace(/"/g, '"')}">
       </div>
-
       <div class="form-group">
         <label>Partie mięśniowe (wielokrotny wybór)</label>
         <div id="cex-muscles">${this.renderMuscleTable(selectedMuscles, 'create')}</div>
         <p class="text-xs text-muted mt-8">Pierwsza zaznaczona partia = główna</p>
       </div>
-
       <div class="form-group">
         <label>Zdjęcie lub wideo (opcjonalnie, max ${this.MAX_MEDIA_KB} KB)</label>
         <div class="media-box">
@@ -307,17 +270,9 @@ const Exercises = {
               <input type="file" id="cex-video" accept="video/*" hidden>
             </label>
           </div>
-          <div id="cex-media-preview" class="media-preview ${this.pendingMedia ? 'show' : ''}">
-            ${this.pendingMedia
-              ? (this.pendingMedia.type === 'image'
-                ? `<img src="${this.pendingMedia.dataUrl}" alt="">`
-                : `<video src="${this.pendingMedia.dataUrl}" controls></video>`)
-              : ''}
-            ${this.pendingMedia ? `<button type="button" class="btn btn-ghost media-remove" id="cex-media-remove" style="color:var(--danger)">Usuń media</button>` : ''}
-          </div>
+          <div id="cex-media-preview" class="media-preview ${this.pendingMedia ? 'show' : ''}"></div>
         </div>
       </div>
-
       <div class="form-group">
         <label>Sprzęt</label>
         <div class="equip-chips" id="cex-equip">
@@ -326,7 +281,6 @@ const Exercises = {
           `).join('')}
         </div>
       </div>
-
       <div class="form-row-2">
         <div class="form-group">
           <label>Poziom</label>
@@ -345,20 +299,19 @@ const Exercises = {
           </select>
         </div>
       </div>
-
       <div class="form-group">
         <label>Opis / instrukcja</label>
-        <textarea class="form-textarea" id="cex-desc" placeholder="Jak wykonać ćwiczenie...">${existing?.description || existing?.instructions || ''}</textarea>
+        <textarea class="form-textarea" id="cex-desc">${existing?.description || existing?.instructions || ''}</textarea>
       </div>
-
       <button class="btn btn-primary btn-block mt-16" id="cex-save">${isEdit ? 'Zapisz zmiany' : 'Zapisz na konto'}</button>
     `);
+
+    if (this.pendingMedia) this.refreshMediaPreview();
 
     document.querySelectorAll('#cex-muscles input[data-mode="create"]').forEach(cb => {
       const label = cb.closest('.muscle-item');
       cb.addEventListener('change', () => label?.classList.toggle('selected', cb.checked));
     });
-
     document.querySelectorAll('#cex-equip .filter-chip').forEach(chip => {
       chip.addEventListener('click', () => chip.classList.toggle('active'));
     });
@@ -394,11 +347,6 @@ const Exercises = {
       loadMedia(e.target.files?.[0], 'video');
       e.target.value = '';
     });
-    document.getElementById('cex-media-remove')?.addEventListener('click', () => {
-      this.pendingMedia = null;
-      this.refreshMediaPreview();
-    });
-
     document.getElementById('cex-save')?.addEventListener('click', () => this.saveCustom());
   },
 
@@ -430,8 +378,7 @@ const Exercises = {
         if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         let quality = 0.72;
         let out = canvas.toDataURL('image/jpeg', quality);
         while (out.length > this.MAX_MEDIA_KB * 1024 * 1.37 && quality > 0.35) {
@@ -447,25 +394,19 @@ const Exercises = {
       };
       img.onerror = () => cb(dataUrl);
       img.src = dataUrl;
-    } catch {
-      cb(dataUrl);
-    }
+    } catch { cb(dataUrl); }
   },
 
   saveCustom() {
     const name = document.getElementById('cex-name')?.value.trim();
     if (!name) { Utils.toast('Podaj nazwę'); return; }
-
     const muscles = Array.from(document.querySelectorAll('#cex-muscles input[data-mode="create"]:checked'))
       .map(cb => cb.dataset.muscle);
     if (!muscles.length) { Utils.toast('Wybierz co najmniej jedną partię mięśniową'); return; }
-
     const equipment = Array.from(document.querySelectorAll('#cex-equip .filter-chip.active'))
       .map(c => c.dataset.eq);
-
     const desc = document.getElementById('cex-desc')?.value.trim() || '';
     const list = Storage.getCustomExercises();
-
     const payload = {
       name,
       musclePrimary: muscles[0],
@@ -489,32 +430,20 @@ const Exercises = {
         name: this.pendingMedia.name || ''
       };
     }
-
     if (this.editingId) {
       const idx = list.findIndex(e => e.id === this.editingId);
       if (idx >= 0) {
-        const prev = list[idx];
-        const next = {
-          ...prev,
-          ...payload,
-          id: this.editingId,
-          createdAt: prev.createdAt || new Date().toISOString()
-        };
+        const next = { ...list[idx], ...payload, id: this.editingId, createdAt: list[idx].createdAt || new Date().toISOString() };
         if (!payload.media) delete next.media;
         list[idx] = next;
       }
       Storage.saveCustomExercises(list);
       Utils.toast('Zapisano zmiany');
     } else {
-      list.unshift({
-        ...payload,
-        id: 'custom_' + Utils.uid(),
-        createdAt: new Date().toISOString()
-      });
+      list.unshift({ ...payload, id: 'custom_' + Utils.uid(), createdAt: new Date().toISOString() });
       Storage.saveCustomExercises(list);
       Utils.toast('Ćwiczenie zapisane na koncie');
     }
-
     this.editingId = null;
     this.pendingMedia = null;
     Utils.closeModal();
