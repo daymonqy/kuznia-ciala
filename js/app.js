@@ -62,7 +62,6 @@ const App = {
   },
 
   showAuth(extraMsg) {
-    document.getElementById('onboarding-screen')?.classList.remove('active');
     document.getElementById('main-app')?.classList.remove('active');
     document.getElementById('auth-screen')?.classList.add('active');
     AuthApp.showLogin();
@@ -71,7 +70,6 @@ const App = {
 
   showMain() {
     document.getElementById('auth-screen')?.classList.remove('active');
-    document.getElementById('onboarding-screen')?.classList.remove('active');
     document.getElementById('main-app')?.classList.add('active');
     const user = Storage.getUser();
     if (user) {
@@ -92,7 +90,6 @@ const App = {
   refresh() {
     const content = document.getElementById('content');
     if (!content) return;
-    let html = '';
     switch (this.currentView) {
       case 'dashboard':
         content.innerHTML = Dashboard.render();
@@ -112,6 +109,7 @@ const App = {
         Workout.bind();
         break;
       case 'progress':
+      case 'records':
         content.innerHTML = Progress.render();
         Progress.bind();
         break;
@@ -126,9 +124,6 @@ const App = {
       case 'calculator':
         content.innerHTML = Calculator.render();
         Calculator.bind();
-        break;
-      case 'records':
-        content.innerHTML = Progress.render();
         break;
       case 'profile':
         content.innerHTML = Profile.renderView();
