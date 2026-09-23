@@ -26,14 +26,18 @@ const Workout = {
         if (!ex) return;
         const hist = Storage.getExerciseHistory(pe.exerciseId);
         const suggestion = Utils.suggestWeight(hist);
+        const details = (pe.setDetails && pe.setDetails.length) ? pe.setDetails : null;
+        const plannedSets = details ? details.length : (pe.sets || 3);
+        const first = details?.[0];
         this.active.exercises.push({
           exerciseId: pe.exerciseId,
           name: ex.name,
           musclePrimary: ex.musclePrimary,
           muscleSecondary: ex.muscleSecondary || [],
-          plannedSets: pe.sets || 3,
-          plannedReps: pe.reps || '8-12',
-          plannedRir: pe.rir ?? 2,
+          plannedSets,
+          plannedReps: first?.reps || pe.reps || '8-12',
+          plannedRir: first?.rir ?? pe.rir ?? 2,
+          plannedSetDetails: details || null,
           rest: pe.rest || settings.restDefault,
           suggestedWeight: suggestion?.weight || null,
           sets: [],
@@ -94,6 +98,11 @@ const Workout = {
     const lastSets = hist[0]?.sets?.filter(s => s.type !== 'warmup').slice(0, 3) || [];
     const completedSets = ex.sets.length;
     const targetSets = ex.plannedSets || 3;
+    const nextPlan = (ex.plannedSetDetails && ex.plannedSetDetails[completedSets])
+      || (ex.plannedSetDetails && ex.plannedSetDetails[ex.plannedSetDetails.length - 1])
+      || null;
+    const nextRir = nextPlan?.rir ?? ex.plannedRir ?? 2;
+    const nextType = nextPlan?.type || 'working';
 
     return `
       <div class="live-header">
@@ -118,6 +127,7 @@ const Workout = {
         <div class="ex-live-prev">
           ${lastSets.length ? 'Poprzednio: ' + lastSets.map(s => `${s.weight}×${s.reps}`).join(' · ') : 'Brak historii'}
           ${ex.suggestedWeight ? ` · Sugerowane: <strong>${ex.suggestedWeight} kg</strong>` : ''}
+          ${nextPlan ? ` · Plan: ${nextPlan.reps} (${SET_TYPES.find(t=>t.id===nextType)?.name || nextType})` : ''}
         </div>
 
         <div class="set-labels">
@@ -140,15 +150,15 @@ const Workout = {
           <input class="set-input" type="number" id="set-reps" min="0" max="100" value="" placeholder="powt">
           ${isBeginner
             ? `<button class="btn btn-accent" id="btn-save-set" style="padding:10px">✓</button>`
-            : `<input class="set-input" type="number" id="set-rir" min="0" max="5" step="1" value="${ex.plannedRir ?? 2}" placeholder="RIR">`}
+            : `<input class="set-input" type="number" id="set-rir" min="0" max="5" step="1" value="${nextRir}" placeholder="RIR">`}
         </div>
 
         ${!isBeginner ? `
         <div class="rir-slider-wrap">
           <div class="text-xs text-muted text-center mb-8">RIR — ile powtórzeń w zapasie</div>
-          <input type="range" class="rir-slider" id="rir-slider" min="0" max="5" step="1" value="${ex.plannedRir ?? 2}">
-          <div class="rir-value" id="rir-display">${ex.plannedRir ?? 2}</div>
-          <div class="rir-desc" id="rir-desc">${this.rirLabel(ex.plannedRir ?? 2)}</div>
+          <input type="range" class="rir-slider" id="rir-slider" min="0" max="5" step="1" value="${nextRir}">
+          <div class="rir-value" id="rir-display">${nextRir}</div>
+          <div class="rir-desc" id="rir-desc">${this.rirLabel(nextRir)}</div>
         </div>
         <div class="flex gap-8 mt-12">
           <div class="form-group" style="flex:1;margin:0">
@@ -163,7 +173,7 @@ const Workout = {
         <div class="form-group mt-12">
           <label>Typ serii</label>
           <select class="form-select" id="set-type">
-            ${SET_TYPES.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+            ${SET_TYPES.map(t => `<option value="${t.id}" ${t.id===nextType?'selected':''}>${t.name}</option>`).join('')}
           </select>
         </div>` : ''}
 
@@ -332,7 +342,8 @@ const Workout = {
               <div class="ex-meta"><span class="ex-badge">${Utils.muscleShort(ex.musclePrimary)}</span></div>
             </div>
           </div>`).join('')}
-      </div>`;
+      </div>
+    `);
     document.querySelectorAll('.live-add-ex').forEach(item => {
       item.addEventListener('click', () => {
         const ex = Utils.getExerciseById(item.dataset.id);
@@ -361,7 +372,8 @@ const Workout = {
           <input type="range" class="rir-slider" id="feel-${i}" min="1" max="5" value="3">
           <div class="text-center font-bold" id="feel-val-${i}">3</div>
         </div>`).join('')}
-      <button class="btn btn-primary btn-block mt-16" id="save-feeling">Zapisz</button>`;
+      <button class="btn btn-primary btn-block mt-16" id="save-feeling">Zapisz</button>
+    `);
     for (let i = 0; i < 5; i++) {
       document.getElementById(`feel-${i}`)?.addEventListener('input', e => {
         document.getElementById(`feel-val-${i}`).textContent = e.target.value;
@@ -432,7 +444,8 @@ const Workout = {
           <div class="flex-between text-sm mb-8"><span>${Utils.muscleShort(m)}</span><span>${Math.round(v.sets)} serii</span></div>`).join('')}
       </div>
       <button class="btn btn-primary btn-block mt-16" id="confirm-finish">Zapisz trening</button>
-      <button class="btn btn-ghost btn-block mt-8" id="btn-feeling-after">Oceń samopoczucie po</button>`;
+      <button class="btn btn-ghost btn-block mt-8" id="btn-feeling-after">Oceń samopoczucie po</button>
+    `);
 
     document.getElementById('confirm-finish')?.addEventListener('click', () => {
       Storage.addWorkout(this.active);
@@ -446,4 +459,3 @@ const Workout = {
     document.getElementById('btn-feeling-after')?.addEventListener('click', () => this.showFeelingModal('after'));
   }
 };
-// v=2
