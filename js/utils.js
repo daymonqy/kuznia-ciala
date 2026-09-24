@@ -152,6 +152,7 @@ const Utils = {
 
   toast(msg, type = '') {
     const el = document.getElementById('toast');
+    if (!el) return;
     el.textContent = msg;
     el.className = 'toast show ' + type;
     clearTimeout(el._t);
@@ -161,12 +162,14 @@ const Utils = {
   showModal(html) {
     const overlay = document.getElementById('modal-overlay');
     const content = document.getElementById('modal-content');
+    if (!overlay || !content) return;
     content.innerHTML = html;
     overlay.classList.add('active');
+    content.onclick = (e) => e.stopPropagation();
   },
 
   closeModal() {
-    document.getElementById('modal-overlay').classList.remove('active');
+    document.getElementById('modal-overlay')?.classList.remove('active');
   },
 
   confirm(msg) {
@@ -174,13 +177,19 @@ const Utils = {
   },
 
   getExerciseById(id) {
+    if (!id) return null;
     const custom = Storage.getCustomExercises();
-    const found = custom.find(e => e.id === id) || EXERCISE_DB.find(e => e.id === id);
+    const db = (typeof EXERCISE_DB !== 'undefined' && Array.isArray(EXERCISE_DB)) ? EXERCISE_DB : [];
+    const found = (Array.isArray(custom) ? custom : []).find(e => e && e.id === id)
+      || db.find(e => e && e.id === id);
     return found || null;
   },
 
   allExercises() {
-    return [...EXERCISE_DB, ...Storage.getCustomExercises()];
+    const db = (typeof EXERCISE_DB !== 'undefined' && Array.isArray(EXERCISE_DB)) ? EXERCISE_DB : [];
+    const custom = Storage.getCustomExercises();
+    const extra = Array.isArray(custom) ? custom.filter(e => e && e.id && e.name) : [];
+    return db.concat(extra);
   },
 
   muscleName(id) {
