@@ -265,7 +265,14 @@ const Plans = {
   },
 
   showAddExerciseModal(planId, dayIndex, existing = null, editIndex = null) {
-    const allEx = Utils.allExercises().filter(ex => ex && ex.id && ex.name);
+    let allEx = [];
+    try {
+      allEx = Utils.allExercises().filter(ex => ex && ex.id && ex.name);
+    } catch (err) {
+      console.error(err);
+      allEx = (typeof EXERCISE_DB !== 'undefined' ? EXERCISE_DB : []).slice();
+    }
+
     const isEdit = !!existing;
     const selectedId = existing?.exerciseId || '';
     let setRows = existing
@@ -283,59 +290,92 @@ const Plans = {
     const typeOptions = (selected) =>
       types.map(t => `<option value="${t.id}" ${selected === t.id ? 'selected' : ''}>${t.name}</option>`).join('');
 
+    const exerciseOptions = (filterQ, filterMuscle) => {
+      let list = allEx;
+      const q = (filterQ || '').toLowerCase().trim();
+      if (q) {
+        list = list.filter(ex =>
+          (ex.name || '').toLowerCase().includes(q) ||
+          (ex.nameEn || '').toLowerCase().includes(q)
+        );
+      }
+      if (filterMuscle && filterMuscle !== 'all') {
+        list = list.filter(ex => {
+          try {
+            if (typeof MuscleTree !== 'undefined' && MuscleTree.matchesFilter) {
+              return MuscleTree.matchesFilter(filterMuscle, MuscleTree.exerciseTags(ex));
+            }
+          } catch (_) {}
+          const tags = [
+            ex.musclePrimary,
+            ...(ex.muscleSecondary || []),
+            ...(ex.musclesMain || []),
+            ...(ex.musclesSupport || [])
+          ].filter(Boolean);
+          return tags.includes(filterMuscle);
+        });
+      }
+      return list;
+    };
+
+    const muscleOpts = (() => {
+      try {
+        if (typeof MUSCLE_TREE !== 'undefined') {
+          const out = [];
+          const walk = (nodes, depth) => {
+            (nodes || []).forEach(n => {
+              out.push(`<option value="${n.id}">${'· '.repeat(depth)}${n.name}</option>`);
+              if (n.children) walk(n.children, depth + 1);
+            });
+          };
+          walk(MUSCLE_TREE, 0);
+          return out.join('');
+        }
+      } catch (_) {}
+      return '';
+    })();
+
     const renderSetRowsHtml = () => setRows.map((s, i) => `
       <div class="set-config-row" data-si="${i}">
         <div class="set-config-num">${i + 1}</div>
-        <input class="form-input set-cfg-reps" data-si="${i}" value="${String(s.reps ?? '8-12').replace(/"/g, '"')}" placeholder="powt." title="Powtórzenia">
-        <select class="form-select set-cfg-type" data-si="${i}" title="Typ serii">${typeOptions(s.type)}</select>
-        <input class="form-input set-cfg-rir" data-si="${i}" type="number" min="0" max="5" value="${s.rir}" placeholder="RIR" title="RIR">
-        <input class="form-input set-cfg-rip" data-si="${i}" type="number" min="1" max="5" value="${s.rip}" placeholder="RIP" title="RIP">
+        <input class="form-input set-cfg-reps" data-si="${i}" value="${String(s.reps ?? '8-12').replace(/"/g, '"')}" placeholder="powt.">
+        <select class="form-select set-cfg-type" data-si="${i}">${typeOptions(s.type)}</select>
+        <input class="form-input set-cfg-rir" data-si="${i}" type="number" min="0" max="5" value="${s.rir}" placeholder="RIR">
+        <input class="form-input set-cfg-rip" data-si="${i}" type="number" min="1" max="5" value="${s.rip}" placeholder="RIP">
         <button type="button" class="btn btn-ghost set-cfg-remove" data-si="${i}" style="color:var(--danger);padding:6px 8px" ${setRows.length <= 1 ? 'disabled' : ''}>×</button>
       </div>
     `).join('');
 
-    const muscleFilterOptions = () => {
-      if (typeof MUSCLE_TREE !== 'undefined') {
-        const out = [];
-        const walk = (nodes, depth) => {
-          (nodes || []).forEach(n => {
-            out.push(`<option value="${n.id}">${'· '.repeat(depth)}${n.name}</option>`);
-            if (n.children) walk(n.children, depth + 1);
-          });
-        };
-        walk(MUSCLE_TREE, 0);
-        return out.join('');
-      }
-      const groups = (typeof MUSCLE_GROUPS !== 'undefined' ? MUSCLE_GROUPS : []);
-      return groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
-    };
-
     Utils.showModal(`
       <div class="modal-header">
         <div class="modal-title">${isEdit ? 'Edytuj ćwiczenie' : 'Dodaj ćwiczenie'}</div>
-        <button class="modal-close" type="button" onclick="Utils.closeModal()">×</button>
+        <button class="modal-close" type="button" id="pex-close">×</button>
       </div>
 
       ${!isEdit ? `
       <div class="form-group">
-        <label>Szukaj</label>
-        <input class="form-input" id="pex-search" placeholder="np. wyciskanie, przysiad..." autocomplete="off">
+        <label>Szukaj po nazwie</label>
+        <input class="form-input" id="pex-search" placeholder="np. wyciskanie..." autocomplete="off">
       </div>
       <div class="form-group">
-        <label>Partia mięśniowa</label>
+        <label>Filtr partii (opcjonalnie)</label>
         <select class="form-select" id="pex-muscle">
           <option value="all">Wszystkie partie</option>
-          ${muscleFilterOptions()}
+          ${muscleOpts}
         </select>
       </div>
-      <div id="pex-list" class="pex-list"></div>
-      <input type="hidden" id="pex-id" value="">
-      <p class="text-xs text-muted mb-12" id="pex-hint">Kliknij ćwiczenie na liście, potem „Dodaj do dnia”</p>
+      <div class="form-group">
+        <label>Wybierz ćwiczenie</label>
+        <select class="form-select" id="pex-select" size="8" style="height:auto;min-height:180px;padding:4px">
+          <option value="">— wybierz z listy —</option>
+        </select>
+        <p class="text-xs text-muted mt-8" id="pex-count"></p>
+      </div>
       ` : `
       <div class="card" style="padding:12px;margin-bottom:14px">
         <div class="font-bold">${(Utils.getExerciseById(selectedId)?.name || selectedId)}</div>
       </div>
-      <input type="hidden" id="pex-id" value="${selectedId}">
+      <input type="hidden" id="pex-select" value="${selectedId}">
       `}
 
       <div class="form-group">
@@ -348,17 +388,17 @@ const Plans = {
       </div>
 
       <div class="form-group">
-        <label>Przerwa między seriami (sekundy)</label>
+        <label>Przerwa (sekundy)</label>
         <input class="form-input" type="number" id="pex-rest" min="0" max="600" value="${restVal}">
       </div>
 
-      <button type="button" class="btn btn-primary btn-block mt-16" id="pex-confirm" ${!isEdit ? 'disabled' : ''}>
+      <button type="button" class="btn btn-primary btn-block mt-16" id="pex-confirm">
         ${isEdit ? 'Zapisz zmiany' : 'Dodaj do dnia'}
       </button>
       <button type="button" class="btn btn-ghost btn-block mt-8" id="pex-back">Wróć do planu</button>
     `);
 
-    document.getElementById('modal-content') && (document.getElementById('modal-content').scrollTop = 0);
+    document.getElementById('pex-close')?.addEventListener('click', () => Utils.closeModal());
 
     const syncRowsFromDom = () => {
       document.querySelectorAll('.set-config-row').forEach(row => {
@@ -376,7 +416,9 @@ const Plans = {
       if (!el) return;
       el.innerHTML = renderSetRowsHtml();
       el.querySelectorAll('.set-cfg-remove').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           syncRowsFromDom();
           const i = Number(btn.dataset.si);
           if (setRows.length <= 1) return;
@@ -385,93 +427,52 @@ const Plans = {
         });
       });
     };
-
     refreshSetRows();
 
-    document.getElementById('add-set-row')?.addEventListener('click', () => {
+    document.getElementById('add-set-row')?.addEventListener('click', (e) => {
+      e.preventDefault();
       syncRowsFromDom();
       const last = setRows[setRows.length - 1] || this.defaultSetRow();
       setRows.push({ ...last });
       refreshSetRows();
     });
 
-    const renderList = () => {
-      const q = (document.getElementById('pex-search')?.value || '').toLowerCase().trim();
+    const fillSelect = () => {
+      if (isEdit) return;
+      const sel = document.getElementById('pex-select');
+      if (!sel) return;
+      const q = document.getElementById('pex-search')?.value || '';
       const muscle = document.getElementById('pex-muscle')?.value || 'all';
-      let list = allEx.slice();
-
-      if (q) {
-        list = list.filter(ex =>
-          (ex.name || '').toLowerCase().includes(q) ||
-          (ex.nameEn || '').toLowerCase().includes(q)
-        );
-      }
-
-      if (muscle && muscle !== 'all') {
-        list = list.filter(ex => {
-          if (typeof MuscleTree !== 'undefined' && MuscleTree.matchesFilter) {
-            return MuscleTree.matchesFilter(muscle, MuscleTree.exerciseTags(ex));
-          }
-          const tags = [
-            ex.musclePrimary,
-            ...(ex.muscleSecondary || []),
-            ...(ex.musclesMain || []),
-            ...(ex.musclesSupport || []),
-            ...(ex.muscles || [])
-          ].filter(Boolean);
-          return tags.includes(muscle);
-        });
-      }
-
-      list = list.slice(0, 40);
-      const el = document.getElementById('pex-list');
-      if (!el) return;
-      const cur = document.getElementById('pex-id')?.value || '';
-
-      if (!list.length) {
-        el.innerHTML = '<p class="text-sm text-muted text-center" style="padding:16px">Brak ćwiczeń — zmień filtr</p>';
-        return;
-      }
-
-      el.innerHTML = list.map(ex => {
-        const main = (ex.musclesMain && ex.musclesMain[0]) || ex.musclePrimary || '';
-        const badge = Utils.muscleShort(main) || main;
-        return `
-        <button type="button" class="pex-item ${cur === ex.id ? 'selected' : ''}" data-id="${ex.id}">
-          <span class="pex-icon">${ex.icon || '🏋️'}</span>
-          <div class="pex-info">
-            <div class="text-sm font-bold">${ex.name}</div>
-            <div class="text-xs text-muted">${badge}</div>
-          </div>
-        </button>`;
-      }).join('');
-
-      el.querySelectorAll('.pex-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const idEl = document.getElementById('pex-id');
-          if (idEl) idEl.value = item.dataset.id;
-          el.querySelectorAll('.pex-item').forEach(x => x.classList.remove('selected'));
-          item.classList.add('selected');
-          const btn = document.getElementById('pex-confirm');
-          if (btn) {
-            btn.disabled = false;
-            btn.removeAttribute('disabled');
-          }
-          const hint = document.getElementById('pex-hint');
-          if (hint) hint.textContent = 'Wybrano: ' + (item.querySelector('.font-bold')?.textContent || '');
-        });
-      });
+      const prev = sel.value;
+      const list = exerciseOptions(q, muscle);
+      sel.innerHTML = '<option value="">— wybierz z listy (' + list.length + ') —</option>' +
+        list.map(ex => {
+          let badge = '';
+          try { badge = Utils.muscleShort((ex.musclesMain && ex.musclesMain[0]) || ex.musclePrimary) || ''; } catch (_) {}
+          const label = badge ? `${ex.name} (${badge})` : ex.name;
+          return `<option value="${ex.id}">${label.replace(/</g, '')}</option>`;
+        }).join('');
+      if (prev && list.some(e => e.id === prev)) sel.value = prev;
+      const cnt = document.getElementById('pex-count');
+      if (cnt) cnt.textContent = list.length ? `Pokazano ${list.length} ćwiczeń — wybierz z listy powyżej` : 'Brak wyników — zmień filtr';
     };
 
     if (!isEdit) {
-      renderList();
-      document.getElementById('pex-search')?.addEventListener('input', renderList);
-      document.getElementById('pex-muscle')?.addEventListener('change', renderList);
+      fillSelect();
+      document.getElementById('pex-search')?.addEventListener('input', fillSelect);
+      document.getElementById('pex-muscle')?.addEventListener('change', fillSelect);
     }
 
-    document.getElementById('pex-confirm')?.addEventListener('click', () => {
+    document.getElementById('pex-confirm')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       try {
-        const exerciseId = document.getElementById('pex-id')?.value;
+        let exerciseId = '';
+        if (isEdit) {
+          exerciseId = selectedId;
+        } else {
+          exerciseId = document.getElementById('pex-select')?.value || '';
+        }
         if (!exerciseId) {
           Utils.toast('Wybierz ćwiczenie z listy');
           return;
@@ -503,12 +504,12 @@ const Plans = {
         const plans = Storage.getPlans();
         const plan = plans.find(p => p.id === planId);
         if (!plan) {
-          Utils.toast('Nie znaleziono planu');
+          Utils.toast('Nie znaleziono planu — odśwież stronę');
           return;
         }
         if (!Array.isArray(plan.days)) plan.days = [];
         if (!plan.days[dayIndex]) {
-          Utils.toast('Nie znaleziono dnia treningowego');
+          Utils.toast('Nie znaleziono dnia');
           return;
         }
         if (!Array.isArray(plan.days[dayIndex].exercises)) {
@@ -521,14 +522,17 @@ const Plans = {
           plan.days[dayIndex].exercises.push(entry);
         }
         Storage.savePlans(plans);
-        Utils.toast(isEdit ? 'Zaktualizowano ćwiczenie' : 'Dodano ćwiczenie do planu');
+        Utils.toast(isEdit ? 'Zaktualizowano' : 'Dodano: ' + (Utils.getExerciseById(exerciseId)?.name || exerciseId));
         this.showEdit(planId);
       } catch (err) {
         console.error(err);
-        Utils.toast('Błąd zapisu: ' + (err.message || 'nieznany'));
+        Utils.toast('Błąd: ' + (err && err.message ? err.message : 'nieznany'));
       }
     });
 
-    document.getElementById('pex-back')?.addEventListener('click', () => this.showEdit(planId));
+    document.getElementById('pex-back')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.showEdit(planId);
+    });
   }
 };
