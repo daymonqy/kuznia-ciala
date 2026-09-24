@@ -1,4 +1,4 @@
-/* Professional theme + exercise UI + muscle tree */
+/* Professional theme + exercise UI + muscle tree + plan picker */
 :root {
   --bg: #0a0b0d;
   --bg-elevated: #111318;
@@ -133,3 +133,97 @@
   padding-left: 6px;
 }
 .mt-node[data-depth="0"] > .mt-row .mt-name { font-weight: 600; color: var(--text); }
+
+/* Plan exercise picker */
+.pex-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 14px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.pex-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, background 0.12s;
+}
+.pex-item:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-card-hover);
+}
+.pex-item.selected {
+  border-color: rgba(201, 162, 39, 0.45);
+  background: var(--primary-dim);
+}
+.pex-icon { font-size: 20px; flex-shrink: 0; }
+.pex-info { min-width: 0; }
+
+.plan-ex-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+  margin-bottom: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.plan-ex-order { display: flex; flex-direction: column; gap: 2px; }
+.order-btn {
+  width: 28px; height: 22px;
+  padding: 0;
+  font-size: 11px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.order-btn:disabled { opacity: 0.35; cursor: default; }
+.plan-ex-main { flex: 1; min-width: 0; }
+
+.set-config-labels {
+  display: grid;
+  grid-template-columns: 28px 1fr 1.1fr 52px 52px 36px;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
+.set-config-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 1.1fr 52px 52px 36px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.set-config-num {
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.set-config-row .form-input,
+.set-config-row .form-select {
+  padding: 8px 6px;
+  font-size: 13px;
+}
