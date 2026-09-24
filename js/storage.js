@@ -94,7 +94,10 @@ const Storage = {
 
   getUser() { return this.get(this.KEYS.USER, null); },
   saveUser(user) { this.set(this.KEYS.USER, user); },
-  getWorkouts() { return this.get(this.KEYS.WORKOUTS, []); },
+  getWorkouts() {
+    const v = this.get(this.KEYS.WORKOUTS, []);
+    return Array.isArray(v) ? v : [];
+  },
   saveWorkouts(workouts) { this.set(this.KEYS.WORKOUTS, workouts); },
   addWorkout(workout) {
     const list = this.getWorkouts();
@@ -102,9 +105,15 @@ const Storage = {
     this.saveWorkouts(list);
     return workout;
   },
-  getPlans() { return this.get(this.KEYS.PLANS, []); },
+  getPlans() {
+    const v = this.get(this.KEYS.PLANS, []);
+    return Array.isArray(v) ? v : [];
+  },
   savePlans(plans) { this.set(this.KEYS.PLANS, plans); },
-  getCustomExercises() { return this.get(this.KEYS.CUSTOM_EX, []); },
+  getCustomExercises() {
+    const v = this.get(this.KEYS.CUSTOM_EX, []);
+    return Array.isArray(v) ? v : [];
+  },
   saveCustomExercises(list) { this.set(this.KEYS.CUSTOM_EX, list); },
   getSettings() {
     return this.get(this.KEYS.SETTINGS, {
@@ -117,7 +126,10 @@ const Storage = {
     });
   },
   saveSettings(s) { this.set(this.KEYS.SETTINGS, s); },
-  getBodyLog() { return this.get(this.KEYS.BODY_LOG, []); },
+  getBodyLog() {
+    const v = this.get(this.KEYS.BODY_LOG, []);
+    return Array.isArray(v) ? v : [];
+  },
   addBodyLog(entry) {
     const list = this.getBodyLog();
     list.unshift(entry);
@@ -125,7 +137,10 @@ const Storage = {
   },
   isOnboarded() { return true; },
   setOnboarded() { this.set(this.KEYS.ONBOARDED, true); },
-  getGoals() { return this.get(this.KEYS.GOALS, []); },
+  getGoals() {
+    const v = this.get(this.KEYS.GOALS, []);
+    return Array.isArray(v) ? v : [];
+  },
   saveGoals(g) { this.set(this.KEYS.GOALS, g); },
   getEquipmentSets() {
     const def = [{
@@ -133,7 +148,8 @@ const Storage = {
       plates: { 25: 2, 20: 2, 15: 2, 10: 2, 5: 2, 2.5: 2, 1.25: 2 },
       bars: [{ name: 'Olimpijska', weight: 20 }]
     }];
-    return this.get(this.KEYS.EQUIPMENT_SETS, def);
+    const v = this.get(this.KEYS.EQUIPMENT_SETS, def);
+    return Array.isArray(v) ? v : def;
   },
   saveEquipmentSets(s) { this.set(this.KEYS.EQUIPMENT_SETS, s); },
   getExerciseHistory(exerciseId) {
